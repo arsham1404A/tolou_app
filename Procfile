@@ -1,1 +1,1 @@
-web: gunicorn tolou_app.wsgi --log-file -
+web: gunicorn tolou_app.wsgi
