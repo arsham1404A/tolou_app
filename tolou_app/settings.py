@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(file).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v283gegvn!2h1pws2kk*v=5k%0&l_-nzmpf&qs6ctc4h9a#a2y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['tolou-app.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -149,8 +149,7 @@ JAZZMIN_SETTINGS = {
         "core.GalleryAlbum",
         "core.GalleryPhoto",
     ],
-
-    # آیکون‌های منو
+ # آیکون‌های منو
     "icons": {
         "auth": "fas fa-users-cog",
         "core.User": "fas fa-user",
