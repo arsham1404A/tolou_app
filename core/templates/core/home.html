@@ -368,7 +368,7 @@
     </div>
     
     {% if banner and banner.show_date %}
-[10/27/2026 1:26 AM] Pete Hegseth: <script>
+ <script>
         const targetDate = new Date("{{ banner.show_date|date:'Y-m-d H:i:s' }}").getTime();
         const timerInterval = setInterval(function() {
             const now = new Date().getTime();

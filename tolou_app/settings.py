@@ -145,7 +145,7 @@ JAZZMIN_SETTINGS = {
         "core.HomeBanner",
         "core.Actor",
         "core.AllowedActorPhone",
-        "core.Play",
+ "core.Play",
         "core.GalleryAlbum",
         "core.GalleryPhoto",
     ],
