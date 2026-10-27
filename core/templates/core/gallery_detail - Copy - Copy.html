@@ -1,0 +1,281 @@
+ {% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گالری طلوع | {{ album.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+        }
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 35px;
+            background: #090E0B;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-area img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 1px solid #00ffcc;
+            background: #fff;
+            padding: 2px;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+        }
+        .logo-area h1 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #00ffcc;
+            text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+        }
+        .back-btn {
+            color: #E5C583;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(229, 197, 131, 0.4);
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #E5C583;
+            color: #000;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .album-title-box {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .album-title-box h2 {
+            color: #E5C583;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        .album-title-box p {
+            color: #94A3B8;
+            font-size: 13px;
+        }
+
+        /* گرید عکس‌های آلبوم */
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .photo-card {
+            background: #090E0B;
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .photo-card:hover {
+            border-color: #00ffcc;
+            background: #122B20;
+            transform: translateY(-4px);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+        .photo-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+            transition: transform 0.3s;
+        }
+        .photo-card:hover .photo-img {
+            transform: scale(1.03);
+        }
+        .photo-caption {
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
+            color: #CBD5E1;
+        }
+
+        .no-photo {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 14px;
+            grid-column: span 12;
+            padding: 50px;
+            background: #090E0B;
+            border: 1px dashed rgba(0, 255, 204, 0.3);
+            border-radius: 16px;
+        }
+ /* پنجره تمام‌صفحه (LightBox Modal) */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 80vh;
+            border: 2px solid #00ffcc;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.5);
+            object-fit: contain;
+        }
+        .lightbox-caption {
+            color: #E5C583;
+            margin-top: 15px;
+            font-size: 15px;
+            text-align: center;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 25px;
+            left: 35px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .lightbox-close:hover {
+            color: #00ffcc;
+        }
+
+        .floating-footer-menu {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(9, 14, 11, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(82, 183, 136, 0.4);
+            padding: 10px 25px;
+            border-radius: 40px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            z-index: 1000;
+        }
+        .floating-footer-menu a {
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .floating-footer-menu a:hover,
+        .floating-footer-menu a.active {
+            color: #52B788;
+            text-shadow: 0 0 10px rgba(82, 183, 136, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <img src="{% static 'images/logo.png' %}" alt="لوگو طلوع">
+            <h1>گالری طلوع</h1>
+        </div>
+        <a href="{% url 'gallery_list' %}" class="back-btn">← بازگشت به آلبوم‌ها</a>
+    </header>
+
+    <div class="container">
+        <div class="album-title-box">
+            <h2>{{ album.title }}</h2>
+            <p>{{ album.description|default:"تصاویر و لحظات ثبت شده این آلبوم" }}</p>
+        </div>
+
+        <div class="photos-grid">
+            {% if photos %}
+                {% for photo in photos %}
+                    <div class="photo-card" onclick="openLightbox('{{ photo.image.url }}', '{{ photo.caption|default:album.title }}')">
+                        {% if photo.image %}
+                            <img src="{{ photo.image.url }}" alt="تصویر گالری" class="photo-img">
+                        {% endif %}
+                        {% if photo.caption %}
+                            <div class="photo-caption">{{ photo.caption }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-photo">
+                    هنوز عکسی به این آلبوم اضافه نشده است. (از طریق پنل ادمین می‌توانید عکس اضافه کنید)
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ساختار مدال تمام‌صفحه (LightBox) -->
+    <div id="lightboxModal" class="lightbox-modal" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightboxImg">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+
+    <!-- اسکریپت باز و بسته کردن عکس تمام‌صفحه -->
+ <script>
+        function openLightbox(imgSrc, captionText) {
+            const modal = document.getElementById("lightboxModal");
+            const modalImg = document.getElementById("lightboxImg");
+            const caption = document.getElementById("lightboxCaption");
+            
+            modal.style.display = "flex";
+            modalImg.src = imgSrc;
+            caption.innerHTML = captionText;
+        }
+
+        function closeLightbox() {
+            document.getElementById("lightboxModal").style.display = "none";
+        }
+    </script>
+
+    <div class="floating-footer-menu">
+        <a href="{% url 'history' %}">تاریخچه</a>
+        <a href="#">رزرو اجرا</a>
+        <a href="{% url 'home' %}">صفحه اصلی</a>
+        <a href="#">کمک به گروه</a>
+    </div>
+
+</body>
+</html>

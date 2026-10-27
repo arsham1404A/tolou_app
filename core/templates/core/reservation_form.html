@@ -1,0 +1,212 @@
+ {% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه جامع تئاتر طلوع | رزرو اجرا</title>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+        }
+        body {
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            /* پس‌زمینه تمام صفحه - بعداً می‌تونی عکس دلخواهت رو اینجا بذاری */
+            background: url('{% static "images/reservation_bg.jpg" %}') no-repeat center center/cover;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1;
+        }
+
+        .form-container {
+            position: relative;
+            z-index: 2;
+            background: rgba(9, 14, 11, 0.9);
+            border: 1px solid rgba(82, 183, 136, 0.4);
+            padding: 35px 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+        }
+
+        .form-container h2 {
+            font-size: 22px;
+            color: #E5C583;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #CBD5E1;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            background: #122B20;
+            border: 1px solid #52B788;
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: #E5C583;
+            box-shadow: 0 0 10px rgba(229, 197, 131, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 90px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #52B788;
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #E5C583;
+            box-shadow: 0 0 15px rgba(229, 197, 131, 0.4);
+        }
+
+        .notice-text {
+            text-align: center;
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+        .back-link:hover {
+            color: #E5C583;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>فرم درخواست رزرو اجرا 🎭</h2>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>نام و نام خانوادگی:</label>
+                <input type="text" name="full_name" required placeholder="مثال: علی رضایی">
+            </div>
+ <div class="form-group">
+                <label>شماره همراه:</label>
+                <input type="text" name="phone" required placeholder="09123456789">
+            </div>
+
+            <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>استان:</label>
+                    <input type="text" name="province" required placeholder="مثال: تهران">
+                </div>
+                <div>
+                    <label>شهر:</label>
+                    <input type="text" name="city" required placeholder="مثال: تهران">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>آدرس دقیق محل مورد نظر:</label>
+                <textarea name="address" required placeholder="استان، شهر، خیابان، پلاک، سالن یا مسجد..."></textarea>
+            </div>
+
+            <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>ظرفیت صوت مکان:</label>
+                    <select name="sound_capacity">
+                        <option value="ندارد">ندارد</option>
+                        <option value="ضعیف">ضعیف</option>
+                        <option value="خوب">خوب</option>
+                        <option value="خیلی خوب">خیلی خوب</option>
+                    </select>
+                </div>
+                <div>
+                    <label>ظرفیت نور:</label>
+                    <select name="light_capacity">
+                        <option value="ندارد">ندارد</option>
+                        <option value="ضعیف">ضعیف</option>
+                        <option value="خوب" selected>خوب</option>
+                        <option value="خیلی خوب">خیلی خوب</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>نمایشنامه مورد نظر برای اجرا:</label>
+                <select name="play_title">
+                    <option value="یاس پرپر">یاس پرپر</option>
+                    <option value="حضرت عباس">حضرت عباس</option>
+                    <option value="امام حسین">امام حسین</option>
+                    <option value="حضرت علی اکبر">حضرت علی اکبر</option>
+                    <option value="حضرت قاسم">حضرت قاسم</option>
+                    <option value="حضرت رقیه">حضرت رقیه</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>مبلغ پیشنهادی شما (به ریال):</label>
+                <input type="text" name="offered_price" required placeholder="مثال: 5000000">
+            </div>
+
+            <button type="submit" class="submit-btn">ارسال فرم رزرو</button>
+        </form>
+
+        <p class="notice-text">در صورت تایید با شما تماس گرفته خواهد شد.</p>
+        <a href="{% url 'home' %}" class="back-link">← بازگشت به صفحه اصلی</a>
+    </div>
+
+</body>
+</html>

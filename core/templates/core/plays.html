@@ -1,0 +1,171 @@
+c
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آرشیو نمایشنامه‌ها | گروه تئاتر طلوع</title>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
+        body { background: #050907; color: #fff; min-height: 100vh; padding: 40px 20px; }
+        
+        .header-title { text-align: center; color: #00ff66; margin-bottom: 40px; text-shadow: 0 0 10px rgba(0,255,102,0.4); }
+        .plays-container { max-width: 850px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+        
+        .play-card {
+            background: rgba(9, 14, 11, 0.9);
+            border: 1px solid rgba(0, 255, 102, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* قسمت چندرسانه‌ای (پوستر ↔️ تیزر) */
+        .media-box {
+            position: relative;
+            width: 100%;
+            height: 420px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #00ff66;
+            background: #000;
+        }
+
+        .play-poster, .play-teaser {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0; right: 0;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* پوستر کشیده میشه سمت چپ و میره بیرون */
+        .play-poster.slide-out {
+            transform: translateX(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* فلش تبدیل پوستر به تیزر */
+        .switch-btn {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 255, 102, 0.2);
+            border: 1px solid #00ff66;
+            color: #00ff66;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            font-size: 20px;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .switch-btn:hover {
+            background: #00ff66;
+            color: #000;
+            box-shadow: 0 0 15px #00ff66;
+        }
+
+        /* بخش توضیحات */
+        .play-info { margin-top: 20px; text-align: right; }
+        .play-info h2 { color: #E5C583; font-size: 20px; margin-bottom: 8px; }
+        .short-desc { color: #94A3B8; font-size: 14px; line-height: 1.6; }
+        
+        .full-desc {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(0,255,102,0.2);
+            color: #CBD5E1;
+            font-size: 13.5px;
+            line-height: 1.8;
+        }
+
+        .more-btn {
+            background: none;
+            border: none;
+            color: #00ff66;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="header-title">🎭 آرشیو نمایشنامه‌های گروه طلوع</h1>
+
+    <div class="plays-container">
+        
+        <div class="play-card">
+            <div class="media-box">
+                <!-- ویدیو تیزر (پشت پوستر) -->
+                <video class="play-teaser" controls>
+                    <source src="{{ play.teaser.url }}" type="video/mp4">
+                    مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+                </video>
+
+                <!-- پوستر (روی ویدیو) -->
+                <img src="{{ play.poster.url }}" class="play-poster" id="poster-{{ play.id }}">
+ <!-- فلش سمت چپ برای رفتن پوستر و آمدن تیزر -->
+                <button class="switch-btn" onclick="toggleTeaser('{{ play.id }}')" title="مشاهده تیزر">
+                    ❮
+                </button>
+            </div>
+
+            <div class="play-info">
+                <h2>{{ play.title }}</h2>
+                <p class="short-desc">{{ play.short_description }}</p>
+
+                <div class="full-desc" id="full-desc-{{ play.id }}">
+                    {{ play.full_description|linebreaks }}
+                </div>
+
+                <button class="more-btn" onclick="toggleDesc('{{ play.id }}', this)">
+                    <span>توضیحات بیشتر</span> ▼
+                </button>
+            </div>
+        </div>
+        
+        <p style="text-align: center; color: #888;">هیچ نمایشنامه‌ای هنوز ثبت نشده است.</p>
+        
+    </div>
+
+    <script>
+        // سوئیچ پوستر به تیزر
+        function toggleTeaser(id) {
+            const poster = document.getElementById('poster-' + id);
+            if (poster) {
+                poster.classList.toggle('slide-out');
+            }
+        }
+
+        // آکاردئون توضیحات بیشتر
+        function toggleDesc(id, btn) {
+            const fullDesc = document.getElementById('full-desc-' + id);
+            if (fullDesc) {
+                if (fullDesc.style.display === "block") {
+                    fullDesc.style.display = "none";
+                    btn.innerHTML = "<span>توضیحات بیشتر</span> ▼";
+                } else {
+                    fullDesc.style.display = "block";
+                    btn.innerHTML = "<span>بستن توضیحات</span> ▲";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+ {% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تئاتر طلوع | تست بازیگری و عضویت</title>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+        }
+        body {
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: url('{% static "images/audition_bg.jpg" %}') no-repeat center center/cover;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            background: rgba(9, 14, 11, 0.95);
+            border: 1px solid rgba(229, 197, 131, 0.3);
+            padding: 35px 30px;
+            border-radius: 20px;
+            max-width: 550px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+        }
+
+        h2 {
+            font-size: 21px;
+            color: #E5C583;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* استایل بخش شرایط */
+        .terms-box {
+            background: #122B20;
+            border: 1px solid #52B788;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #CBD5E1;
+            line-height: 1.9;
+            margin-bottom: 20px;
+            max-height: 230px;
+            overflow-y: auto;
+        }
+
+        .terms-box ul {
+            margin-right: 20px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            accent-color: #52B788;
+            cursor: pointer;
+        }
+
+        /* استایل فرم اطلاعات */
+        #form-section {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #CBD5E1;
+            margin-bottom: 6px;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            background: #122B20;
+            border: 1px solid #52B788;
+            color: #fff;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input[type="file"] {
+            padding: 9px;
+            background: #0B1913;
+            cursor: pointer;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #E5C583;
+            box-shadow: 0 0 10px rgba(229, 197, 131, 0.3);
+        }
+
+        .action-btn {
+            width: 100%;
+            background: #52B788;
+            color: #000;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .action-btn:disabled {
+            background: #2b3e34;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+ .action-btn:hover:not(:disabled) {
+            background: #E5C583;
+            box-shadow: 0 0 15px rgba(229, 197, 131, 0.4);
+        }
+
+        .notice-text {
+            text-align: center;
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 15px;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+        .back-link:hover {
+            color: #E5C583;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- مرحله اول: شرایط عضویت -->
+        <div id="terms-section">
+            <h2>شرایط عضویت در گروه تئاتر طلوع 📜</h2>
+            <div class="terms-box">
+                <p>برای پیوستن به خانواده بزرگ تئاتر طلوع، رعایت موارد زیر الزامی است:</p>
+                <ul>
+                    <li>التزام عملی به حجاب اسلامی و موازین اخلاقی</li>
+                    <li>علاقه‌مندی واقعی به کار تیمی و روحیه جمعی</li>
+                    <li>تعهد کامل به حضور منظم در تمرینات و برنامه‌ها</li>
+                    <li>مسئولیت‌پذیری و انضباط در اجرای پروژه‌ها</li>
+                </ul>
+            </div>
+
+            <label class="checkbox-group">
+                <input type="checkbox" id="agree-checkbox" onchange="toggleNextButton()">
+                شرایط بالا را مطالعه کرده و با تمام موارد موافقم.
+            </label>
+
+            <button type="button" id="next-btn" class="action-btn" disabled onclick="showFormSection()">مرحله بعد و تکمیل فرم</button>
+        </div>
+
+        <!-- مرحله دوم: فرم اطلاعات و ویدیو -->
+        <div id="form-section">
+            <h2>فرم ثبت‌نام و تست بازیگری 🎭</h2>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>نام و نام خانوادگی:</label>
+                    <input type="text" name="full_name" required placeholder="مثال: علی رضایی">
+                </div>
+
+                <div class="form-group">
+                    <label>شماره تماس:</label>
+                    <input type="text" name="phone" required placeholder="09123456789">
+                </div>
+
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label>جنسیت:</label>
+                        <select name="gender">
+                            <option value="male">آقا</option>
+                            <option value="female">خانم</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>علاقه‌مندی:</label>
+                        <select name="interest">
+                            <option value="بازیگری">بازیگری</option>
+                            <option value="نورپردازی">نورپردازی</option>
+                            <option value="صوت و صدا">صوت و صدا</option>
+                            <option value="صحنه و دکور">صحنه و دکور</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ارسال ویدیو (تست / نمونه کار):</label>
+                    <input type="file" name="video_file" accept="video/*" required>
+                </div>
+
+                <button type="submit" class="action-btn">ارسال نهایی درخواست</button>
+            </form>
+
+            <p class="notice-text">در صورت تایید با شما تماس گرفته خواهد شد.</p>
+        </div>
+
+        <a href="{% url 'home' %}" class="back-link">← بازگشت به صفحه اصلی</a>
+    </div>
+
+    <script>
+        function toggleNextButton() {
+            const checkbox = document.getElementById("agree-checkbox");
+            const nextBtn = document.getElementById("next-btn");
+            nextBtn.disabled = !checkbox.checked;
+        }
+ function showFormSection() {
+            document.getElementById("terms-section").style.display = "none";
+            document.getElementById("form-section").style.display = "block";
+        }
+    </script>
+
+</body>
+</html>

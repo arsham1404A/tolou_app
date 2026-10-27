@@ -1,0 +1,319 @@
+ {% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پروفایل کاربری | گروه تئاتر طلوع</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background-color: #050907;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- سیستم پرده تئاتر واقعی --- */
+        .curtain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            pointer-events: none;
+            display: flex;
+        }
+
+        .curtain {
+            width: 50vw;
+            height: 100vh;
+            background: linear-gradient(90deg, #300000 0%, #800000 50%, #400000 100%);
+            box-shadow: inset 0 0 80px #000;
+            position: absolute;
+            top: 0;
+            transition: transform 1.6s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .curtain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(0,0,0,0.5) 0px,
+                transparent 30px,
+                rgba(255,255,255,0.08) 60px,
+                rgba(0,0,0,0.6) 90px
+            );
+        }
+
+        .curtain-left {
+            left: 0;
+            transform: translateX(0);
+        }
+
+        .curtain-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .curtain-open .curtain-left {
+            transform: translateX(-100%);
+        }
+
+        .curtain-open .curtain-right {
+            transform: translateX(100%);
+        }
+
+        /* --- کارت پروفایل سایبرپانک --- */
+        .profile-card {
+            background: rgba(10, 20, 14, 0.95);
+            border: 2px solid #00ff66;
+            box-shadow: 0 0 35px rgba(0, 255, 102, 0.25), inset 0 0 15px rgba(0, 255, 102, 0.05);
+            border-radius: 20px;
+            width: 390px;
+            padding: 30px 25px;
+            position: relative;
+            backdrop-filter: blur(15px);
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 1s ease-out 0.4s;
+        }
+
+        .curtain-open .profile-card {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 255, 102, 0.25);
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+        }
+
+        .user-title-box {
+            text-align: right;
+        }
+
+        .user-title-box h3 {
+            margin: 0;
+            color: #00ff66;
+            font-size: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+        }
+
+        .user-title-box span {
+            font-size: 13px;
+            color: #88a393;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* آواتار دایره‌ای کوچک و شیک گوشه کارت */
+        .avatar-container {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+ .avatar-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00ff66;
+            box-shadow: 0 0 12px rgba(0, 255, 102, 0.4);
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .avatar-container:hover .avatar-img {
+            filter: brightness(0.6);
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #00ff66;
+            background: rgba(0, 0, 0, 0.65);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-align: center;
+        }
+
+        .avatar-container:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #00ff66;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(5, 17, 10, 0.8);
+            border: 1px solid rgba(0, 255, 102, 0.25);
+            border-radius: 10px;
+            color: #a0b0a5;
+            font-size: 14px;
+            cursor: not-allowed;
+        }
+
+        #avatarInput {
+            display: none;
+        }
+
+        .back-home-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 22px;
+            padding: 10px;
+            background: rgba(0, 255, 102, 0.1);
+            border: 1px solid rgba(0, 255, 102, 0.4);
+            border-radius: 10px;
+            color: #00ff66;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-home-btn:hover {
+            background: #00ff66;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+        }
+    </style>
+</head>
+<body id="body">
+
+    <!-- پرده‌ها -->
+    <div class="curtain-container">
+        <div class="curtain curtain-left"></div>
+        <div class="curtain curtain-right"></div>
+    </div>
+
+    <!-- کارت پروفایل -->
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="user-title-box">
+                <h3>پروفایل عوامل</h3>
+                <span>{{ user.get_role_display }}</span>
+            </div>
+            <!-- آواتار دایره‌ای -->
+            <div class="avatar-container" onclick="document.getElementById('avatarInput').click();">
+                {% if user.avatar %}
+                    <img id="avatarPreview" src="{{ user.avatar.url }}" class="avatar-img" alt="پروفایل">
+                {% else %}
+                    <img id="avatarPreview" src="https://via.placeholder.com/150/05110a/00ff66?text=Tolou" class="avatar-img" alt="پروفایل">
+                {% endif %}
+                <div class="avatar-overlay">تغییر عکس</div>
+            </div>
+        </div>
+
+        <form id="avatarForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="avatarInput" name="avatar" accept="image/*" onchange="uploadAvatar()">
+        </form>
+
+        <div class="form-group">
+            <label>نام و نام خانوادگی (غیرقابل تغییر)</label>
+            <input type="text" class="form-input" value="{{ user.get_full_name|default:user.username }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>سمت در گروه</label>
+            <input type="text" class="form-input" value="{{ user.get_role_display }}" readonly>
+        </div>
+[ <div class="form-group">
+            <label>شماره همراه</label>
+            <input type="text" class="form-input" value="{{ user.phone_number }}" readonly>
+        </div>
+
+        <a href="{% url 'home' %}" class="back-home-btn">بازگشت به صفحه اصلی 🎭</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            setTimeout(function() {
+                document.getElementById('body').classList.add('curtain-open');
+            }, 200);
+        };
+
+        function uploadAvatar() {
+            const input = document.getElementById('avatarInput');
+            if (!input.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('avatar', input.files[0]);
+            
+            // گرفتن CSRF Token از کوکی یا فرم
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch("{% url 'profile' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('avatarPreview').src = data.avatar_url;
+                } else {
+                    alert('خطا در آپلود عکس: ' + (data.message || 'مشکل ناشناخته'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('خطا در ارتباط با سرور!');
+            });
+        }
+    </script>
+
+</body>
+</html>
