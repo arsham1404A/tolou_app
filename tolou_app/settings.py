@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# اصلاح خطا از file به file
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # اضافه شدن ویت‌نویز برای رفع مشکل عکس‌ها و استاتیک
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -117,22 +119,25 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "core" / "static",
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
 MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
 AUTH_USER_MODEL = 'core.User'
-STATICFILES_DIRS = [
-    BASE_DIR / "core" / "static",
-]
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+
 JAZZMIN_SETTINGS = {
     "site_title": "سامانه تئاتر طلوع",
     "site_header": "مدیریت تئاتر طلوع",
@@ -140,16 +145,15 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "به پنل مدیریت سلطنتی تئاتر طلوع خوش آمدید",
     "copyright": "گروه فرهنگی هنری طلوع",
     
-    # مرتب‌سازی مدل‌ها در منوی کناری
     "order_with_respect_to": [
-        "core.HomeBanner",
+ "core.HomeBanner",
         "core.Actor",
         "core.AllowedActorPhone",
- "core.Play",
+        "core.Play",
         "core.GalleryAlbum",
         "core.GalleryPhoto",
     ],
- # آیکون‌های منو
+    
     "icons": {
         "auth": "fas fa-users-cog",
         "core.User": "fas fa-user",
@@ -161,7 +165,6 @@ JAZZMIN_SETTINGS = {
     },
 }
 
-# تنظیمات استایل و رنگ‌بندی مشکی و طلایی سلطنتی
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
@@ -182,7 +185,7 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": False,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
-    "theme": "darkly",  # تم دارک و بسیار شیک
+    "theme": "darkly",
     "dark_mode_theme": "darkly",
     "button_classes": {
         "primary": "btn-outline-warning",
@@ -193,4 +196,3 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success"
     }
 }
-STATIC_ROOT = BASE_DIR / 'staticfiles'
