@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.contrib.auth.hashers import make_password, check_password
+import random
+import string
 
 # 🎭 تعریف نقش‌های رسمی گروه تئاتر طلوع
 ROLE_CHOICES = [
@@ -25,12 +28,30 @@ class User(AbstractUser):
         verbose_name_plural = "کاربران"
 
 
-# ۲. لیست شماره‌های مجاز بازیگران و عوامل
+# ۲. لیست شماره‌های مجاز بازیگران و عوامل (تولید اتوماتیک پسورد رندوم در صورت خالی گذاشتن ادمین)
 class AllowedActorPhone(models.Model):
     full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
     phone_number = models.CharField(max_length=11, unique=True, verbose_name="شماره همراه")
+    password = models.CharField(max_length=128, blank=True, null=True, verbose_name="رمز عبور (اگر خالی بگذارید، سیستم خودکار رمز رندوم می‌سازد)")
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default='actor', verbose_name="نقش")
     role_description = models.CharField(max_length=100, default="عوامل/بازیگر", verbose_name="نقش / سمت")
+    
+    # فیلدهای عکس و بیوگرافی برای صفحه بیوگرافی بازیگران
+    bio_image = models.ImageField(upload_to='actors/bio/', blank=True, null=True, verbose_name="عکس بیوگرافی (صفحه هنرمندان)")
+    bio_text = models.TextField(blank=True, null=True, verbose_name="بیوگرافی کوتاه")
+
+    def save(self, *args, **kwargs):
+        # اگر ادمین پسورد را خالی گذاشت، سیستم خودکار یک رمز رندوم ۸ رقمی می‌سازد و هش می‌کند
+        if not self.password:
+            random_pass = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            self.password = make_password(random_pass)
+        elif not self.password.startswith('pbkdf2_sha256$'):
+            self.password = make_password(self.password)
+            
+        super().save(*args, **kwargs)
+
+    def check_user_password(self, raw_password):
+        return check_password(raw_password, self.password)
 
     def str(self):
         return f"{self.full_name} - {self.get_role_display()} ({self.phone_number})"
@@ -67,8 +88,6 @@ class GalleryAlbum(models.Model):
 
     def str(self):
         return self.title
-
-
 class GalleryPhoto(models.Model):
     album = models.ForeignKey(GalleryAlbum, on_delete=models.CASCADE, related_name='photos', verbose_name="آلبوم مربوطه")
     image = models.ImageField(upload_to='gallery/photos/', verbose_name="تصویر")
@@ -95,12 +114,14 @@ class Script(models.Model):
 
     def str(self):
         return self.title
- # ۶. رزرو اجرا برای کاربران عادی (Show & Reservation)
+
+
+# ۶. رزرو اجرا برای کاربران عادی (Show & Reservation)
 class Show(models.Model):
     title = models.CharField(max_length=200, verbose_name="عنوان نمایش")
     date_time = models.DateTimeField(verbose_name="زمان برگزاری")
     capacity = models.PositiveIntegerField(verbose_name="ظرفیت سالن")
-    
+
     class Meta:
         verbose_name = "نمایش / اجرا"
         verbose_name_plural = "رزرو اجراها"
@@ -118,7 +139,7 @@ class Reservation(models.Model):
         ('حضرت قاسم', 'حضرت قاسم'),
         ('حضرت رقیه', 'حضرت رقیه'),
     ]
-    
+
     QUALITY_CHOICES = [
         ('ندارد', 'ندارد'),
         ('ضعیف', 'ضعیف'),
@@ -146,7 +167,7 @@ class Reservation(models.Model):
         return f"{self.full_name} - {self.play_title} ({self.city})"
 
 
-# ۷. فرم تست بازیگری (با فیلدهای جنسیت، علاقه‌مندی و ویدیو)
+# ۷. فرم تست بازیگری
 class Audition(models.Model):
     GENDER_CHOICES = [
         ('male', 'آقا'),
@@ -161,20 +182,19 @@ class Audition(models.Model):
     video_file = models.FileField(upload_to='auditions/videos/', null=True, blank=True, verbose_name="ویدیو ارسالی تست")
     experience = models.TextField(blank=True, null=True, verbose_name="سابقه کاری")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
-
-    class Meta:
+class Meta:
         verbose_name = "درخواست تست بازیگری"
         verbose_name_plural = "درخواست‌های تست بازیگری"
-
-    def str(self):
+        
+def str(self):
         return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}"
 
 
-# ۸. مدل نمایشنامه‌ها (Play)
+# ۸. مدل نمایشنامه‌ها (Play) - با پوستر، تیزر و توضیحات کامل
 class Play(models.Model):
-    title = models.CharField(max_length=200, verbose_name="عنوان نمایشنامه")
+    title = models.CharField(max_length=200, verbose_name="عنوان نمایشنامه") 
     poster = models.ImageField(upload_to='plays/posters/', verbose_name="پوستر نمایشنامه")
-    teaser = models.FileField(upload_to='plays/teasers/', verbose_name="ویدیو تیزر")
+    teaser = models.FileField(upload_to='plays/teasers/', blank=True, null=True, verbose_name="ویدیو تیزر")
     short_description = models.TextField(max_length=300, verbose_name="توضیحات کوتاه")
     full_description = models.TextField(verbose_name="توضیحات کامل")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
@@ -185,7 +205,9 @@ class Play(models.Model):
 
     def str(self):
         return self.title
- # ۹. مدل رویدادهای تاریخچه (HistoryEvent)
+
+
+# ۹. مدل رویدادهای تاریخچه (HistoryEvent)
 class HistoryEvent(models.Model):
     year = models.CharField(max_length=20, verbose_name="سال / تاریخ")
     title = models.CharField(max_length=200, verbose_name="عنوان رویداد")

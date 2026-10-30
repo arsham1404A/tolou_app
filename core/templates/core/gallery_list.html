@@ -181,9 +181,13 @@
             {% if albums %}
                 {% for album in albums %}
                     <a href="{% url 'gallery_detail' album.id %}" class="album-card">
-                        <div style="overflow: hidden;">
+                        <div style="overflow: hidden; height: 210px; background: #000;">
                             {% if album.cover_image %}
-                                <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="album-cover">
+                                <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="album-cover" onerror="this.onerror=null; this.src='{% static 'images/logo.png' %}';">
+                            {% else %}
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94A3B8; font-size: 13px;">
+                                    بدون تصویر کاور
+                                </div>
                             {% endif %}
                         </div>
                         <div class="album-info">
@@ -203,9 +207,9 @@
     <!-- منوی شناور پایین -->
     <div class="floating-footer-menu">
         <a href="{% url 'history' %}">تاریخچه</a>
-        <a href="#">رزرو اجرا</a>
+        <a href="{% url 'reservation_form' %}">رزرو اجرا</a>
         <a href="{% url 'home' %}">صفحه اصلی</a>
-        <a href="#">کمک به گروه</a>
+        <a href="{% url 'help_group' %}">کمک به گروه</a>
     </div>
 
 </body>

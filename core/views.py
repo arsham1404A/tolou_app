@@ -5,31 +5,41 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import AllowedActorPhone, User, HomeBanner, Show, Play, HistoryEvent, GalleryAlbum, GalleryPhoto, Actor, Audition, Reservation
 
-# ۱. ویوی ورود اختصاصی عوامل و بازیگران (با شماره همراه)
+# ۱. ویوی ورود اختصاصی عوامل و بازیگران (با شماره همراه و رمز عبور)
 def actor_login(request):
     if request.method == 'POST':
         phone = request.POST.get('phone_number', '').strip()
+        password = request.POST.get('password', '').strip()
         
-        if not phone:
-            messages.error(request, "لطفاً شماره همراه خود را وارد کنید.")
+        if not phone or not password:
+            messages.error(request, "لطفاً شماره همراه و رمز عبور خود را وارد کنید.")
             return render(request, 'core/login.html')
         
         allowed_actor = AllowedActorPhone.objects.filter(phone_number=phone).first()
         
         if allowed_actor:
-            actor_name = getattr(allowed_actor, 'full_name', 'هنرمند')
-            user, created = User.objects.get_or_create(
-                username=phone,
-                defaults={
-                    'phone_number': phone,
-                    'first_name': actor_name,
-                    'role': allowed_actor.role,
-                    'role_description': allowed_actor.role_description
-                }
-            )
-            login(request, user)
-            messages.success(request, f"خوش آمدید {actor_name} عزیز ⚡️")
-            return redirect('home')
+            # بررسی صحت رمز عبور هش‌شده
+            if allowed_actor.check_user_password(password):
+                actor_name = getattr(allowed_actor, 'full_name', 'هنرمند')
+                user, created = User.objects.get_or_create(
+                    username=phone,
+                    defaults={
+                        'phone_number': phone,
+                        'first_name': actor_name,
+                        'role': allowed_actor.role,
+                        'role_description': allowed_actor.role_description
+                    }
+                )
+                # آپدیت نقش کاربر در صورت تغییر در لیست مجاز
+                user.role = allowed_actor.role
+                user.role_description = allowed_actor.role_description
+                user.save()
+                
+                login(request, user)
+                messages.success(request, f"خوش آمدید {actor_name} عزیز ⚡️")
+                return redirect('home')
+            else:
+                messages.error(request, "رمز عبور اشتباه است.")
         else:
             messages.error(request, "این شماره تلفن در لیست عوامل و بازیگران ثبت نشده است.")
             
@@ -95,18 +105,19 @@ def history_view(request):
 def gallery_list_view(request):
     albums = GalleryAlbum.objects.all().order_by('-created_at')
     return render(request, 'core/gallery_list.html', {'albums': albums})
-
 def gallery_detail_view(request, album_id):
     album = GalleryAlbum.objects.get(id=album_id)
     photos = album.photos.all()
     return render(request, 'core/gallery_detail.html', {'album': album, 'photos': photos})
 
 
-# ۸. ویوی صفحه هنرمندان (Actors)
+# ۸. ویوی صفحه هنرمندان و بیوگرافی بازیگران (متصل به AllowedActorPhone)
 def actors_view(request):
-    actors = Actor.objects.all().order_by('id')
+    actors = AllowedActorPhone.objects.filter(role__in=['actor', 'director_actor']).order_by('id')
     return render(request, 'core/actors.html', {'actors': actors})
- # ۹. ویوی ثبت تست بازیگری (با دریافت ویدیو، جنسیت، علاقه‌مندی و ارسال به پنل کارگردان)
+
+
+# ۹. ویوی ثبت تست بازیگری (با دریافت ویدیو، جنسیت، علاقه‌مندی و ارسال به پنل کارگردان)
 def audition_submit_view(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
@@ -150,8 +161,9 @@ def reservation_form_view(request):
 # ۱۱. ویوی صفحه کمک به گروه
 def help_group_view(request):
     return render(request, 'core/help_group.html')
+
+
 # ۱۲. ویوی صفحه آخرین اجراها و آرشیو (Past Shows)
 def past_shows_view(request):
-    # گرفتن تمام بنرها یا نمایش‌های ثبت شده به عنوان آرشیو اجراهای گذشته
     past_shows = HomeBanner.objects.all().order_by('-show_date')
     return render(request, 'core/past_shows.html', {'past_shows': past_shows})

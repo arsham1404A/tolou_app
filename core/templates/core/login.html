@@ -26,7 +26,7 @@
         .auth-container {
             display: flex;
             width: 950px;
-            height: 540px;
+            height: 580px; /* افزایش ارتفاع کمی برای جادادن فیلد پسورد */
             background: #090E0B;
             border: 1px solid rgba(82, 183, 136, 0.3);
             border-radius: 18px;
@@ -95,7 +95,7 @@
         /* سمت چپ: فرم‌ها */
         .auth-form-side {
             flex: 1;
-            padding: 40px;
+            padding: 30px 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -103,7 +103,7 @@
         }
 
         .form-header {
-            margin-bottom: 22px;
+            margin-bottom: 18px;
         }
 
         .form-header h2 {
@@ -123,7 +123,7 @@
             border: 1px solid rgba(82, 183, 136, 0.25);
             border-radius: 10px;
             padding: 4px;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
         }
 
         .tab-item {
@@ -153,19 +153,19 @@
             display: block;
         }
  .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .input-group label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             color: #CBD5E1;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .text-input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 10px 14px;
             background: #000000;
             border: 1px solid rgba(82, 183, 136, 0.3);
             border-radius: 10px;
@@ -190,6 +190,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
+            margin-top: 5px;
         }
 
         .submit-btn:hover {
@@ -222,6 +223,17 @@
             margin-bottom: 20px;
             line-height: 1.8;
         }
+
+        /* استایل پیام‌های ارور یا موفقیت */
+        .msg {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+        .msg.error { background: rgba(255, 0, 0, 0.2); border: 1px solid rgba(255, 0, 0, 0.4); color: #ff8888; }
+        .msg.success { background: rgba(0, 255, 204, 0.2); border: 1px solid rgba(0, 255, 204, 0.4); color: #00ffcc; }
     </style>
 </head>
 <body>
@@ -241,12 +253,19 @@
             </div>
         </div>
 
-        <!-- سمت چپ: پنل فرم‌ها -->
+        <!-- سمت چپ: فرم‌ها -->
         <div class="auth-form-side">
             <div class="form-header">
                 <h2>ورود به سامانه</h2>
                 <p>لطفاً نقش خود را برای ورود انتخاب کنید</p>
             </div>
+
+            <!-- نمایش پیام‌های جنگو (مثل ارور پسورد اشتباه) -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="msg {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
             <!-- منوی تب‌ها -->
             <div class="tab-menu">
@@ -254,13 +273,17 @@
                 <button type="button" class="tab-item" onclick="switchTab('user')">کاربران عادی / تماشاگران</button>
             </div>
 
-            <!-- پنل عوامل -->
+            <!-- پنل عوامل (به‌روزرسانی شده با شماره و رمز عبور) -->
             <div id="panel-actor" class="form-panel active">
                 <form method="POST">
-                    {% csrf_token %}
+ {% csrf_token %}
                     <div class="input-group">
-                        <label for="phone_number">شماره همراه خود را وارد نمایید</label>
+                        <label for="phone_number">شماره همراه</label>
                         <input type="text" id="phone_number" name="phone_number" class="text-input" placeholder="09123456789" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">رمز عبور اختصاصی</label>
+                        <input type="password" id="password" name="password" class="text-input" placeholder="رمز عبور خود را وارد کنید" required autocomplete="current-password">
                     </div>
                     <button type="submit" class="submit-btn">ورود به پشت‌صحنه ⚡️</button>
                 </form>
@@ -272,7 +295,7 @@
                     جهت دسترسی به رزرو بلیط و بخش‌های عمومی، با حساب گوگل خود وارد شوید.
                 </p>
                 <a href="{% url 'google_login_view' %}" class="google-btn">
- <svg width="18" height="18" viewBox="0 0 24 24">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
                         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.23 24 12 24z"/>
                         <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.85 0 11.7c0 1.85.43 3.58 1.18 5.1l4.09-2.56z"/>
