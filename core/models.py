@@ -186,9 +186,8 @@ class Meta:
         verbose_name = "درخواست تست بازیگری"
         verbose_name_plural = "درخواست‌های تست بازیگری"
         
-def str(self):
-        return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}"
-
+def __str__(self):
+        return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}" 
 
 # ۸. مدل نمایشنامه‌ها (Play) - با پوستر، تیزر و توضیحات کامل
 class Play(models.Model):
@@ -203,7 +202,7 @@ class Play(models.Model):
         verbose_name = "نمایشنامه"
         verbose_name_plural = "نمایشنامه‌ها"
 
-    def str(self):
+    def __str__(self):
         return self.title
 
 
@@ -219,7 +218,7 @@ class HistoryEvent(models.Model):
         verbose_name = "رویداد تاریخچه"
         verbose_name_plural = "تاریخچه و رویدادها"
 
-    def str(self):
+    def __str__(self):
         return f"{self.year} - {self.title}"
 
 

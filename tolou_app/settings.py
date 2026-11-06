@@ -137,7 +137,6 @@ MAILERS = {
 }
 
 AUTH_USER_MODEL = 'core.User'
-
 JAZZMIN_SETTINGS = {
     "site_title": "سامانه تئاتر طلوع",
     "site_header": "مدیریت تئاتر طلوع",

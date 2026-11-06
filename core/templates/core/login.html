@@ -276,7 +276,8 @@
             <!-- پنل عوامل (به‌روزرسانی شده با شماره و رمز عبور) -->
             <div id="panel-actor" class="form-panel active">
                 <form method="POST">
- {% csrf_token %}
+
+                    {% csrf_token %}
                     <div class="input-group">
                         <label for="phone_number">شماره همراه</label>
                         <input type="text" id="phone_number" name="phone_number" class="text-input" placeholder="09123456789" required autocomplete="off">
