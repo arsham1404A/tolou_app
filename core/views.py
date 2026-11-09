@@ -54,7 +54,7 @@ def actor_login(request):
 
                 login(request, user)
                 messages.success(request, f"خوش آمدید {actor_name} عزیز ⚡️")
-                return redirect("dashboard")
+                return redirect("home")
             else:
                 messages.error(request, "رمز عبور اشتباه است.")
         else:
