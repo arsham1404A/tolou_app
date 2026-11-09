@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>پنل کارگردان | گروه تئاتر طلوع</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h1, h2 { color: #4caf50; }
+        .btn { display: inline-block; background: #4caf50; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+        th { background: #2d2d2d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 پنل مدیریت کارگردان</h1>
+        <p>کارگردان گرامی، خوش آمدید.</p>
+        <p>📅 تاریخ امروز: {{ today_jalali }}</p>
+
+        <hr style="border-color: #444;">
+
+        <h2>📚 مدیریت نمایشنامه‌ها</h2>
+        <a href="{% url 'play_create' %}" class="btn">➕ ثبت نمایشنامه جدید</a>
+
+        <ul style="margin-top: 15px; line-height: 1.8;">
+            {% for play in plays %}
+                <li><strong>{{ play.title }}</strong> - {{ play.short_description }}</li>
+            {% empty %}
+                <p style="color: #888;">هیچ نمایشنامه‌ای ثبت نشده است.</p>
+            {% endfor %}
+        </ul>
+
+        <h2 style="margin-top: 30px;">📋 درخواست‌های تست بازیگری</h2>
+        <table>
+            <tr>
+                <th>نام و نام خانوادگی</th>
+                <th>شماره تماس</th>
+                <th>علاقه‌مندی</th>
+                <th>تاریخ ثبت</th>
+            </tr>
+            {% for audition in auditions %}
+            <tr>
+                <td>{{ audition.full_name }}</td>
+                <td>{{ audition.phone }}</td>
+                <td>{{ audition.interest }}</td>
+                <td>{{ audition.created_at|date:"Y/m/d" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="color: #888;">درخواستی وجود ندارد.</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br><br>
+        <a href="{% url 'home' %}" style="color: #4caf50; text-decoration: none;">← بازگشت به صفحه اصلی</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>پنل بازیگر | گروه تئاتر طلوع</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h1, h2 { color: #ff9800; }
+        .btn { display: inline-block; background: #ff9800; color: #121212; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+        .gallery-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
+        .gallery-item { background: #2d2d2d; padding: 10px; border-radius: 8px; width: 150px; text-align: center; }
+        .gallery-item img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; }
+        .birthday-banner { background: linear-gradient(45deg, #ff416c, #ff4b2b); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if is_birthday_today %}
+        <div class="birthday-banner">
+            <h2>🎉🎂 تولدت مبارک آرشام عزیز و هنرمند! 🎂🎉</h2>
+            <p>گروه هنری طلوع زادروزت رو تبریک میگه و برات کلی موفقیت روی صحنه آرزو میکنه!</p>
+        </div>
+        {% endif %}
+
+        <h1>سلام، {{ user.first_name|default:user.username }} عزیز 🎭</h1>
+        <p>سمت در گروه: <strong>{{ user.role_description }}</strong></p>
+        <p>📅 تاریخ امروز (شمسی): {{ today_jalali }}</p>
+
+        <hr style="border-color: #444;">
+
+        <h2>🖼️ آرشیو تصاویر اختصاصی شما</h2>
+        <a href="{% url 'upload_actor_archive' %}" class="btn">➕ آپلود تصویر جدید در آرشیو</a>
+
+        <div class="gallery-grid">
+            {% for photo in my_photos %}
+                <div class="gallery-item">
+                    <img src="{{ photo.image.url }}" alt="تصویر آرشیو">
+                    <p style="font-size: 12px; margin-top: 8px;">{{ photo.caption }}</p>
+                </div>
+            {% empty %}
+                <p style="color: #888; margin-top: 15px;">هنوز عکسی در آرشیو خود آپلود نکرده‌اید.</p>
+            {% endfor %}
+        </div>
+
+        <br><br>
+        <a href="{% url 'home' %}" style="color: #ff9800; text-decoration: none;">← بازگشت به صفحه اصلی</a>
+    </div>
+</body>
+</html>

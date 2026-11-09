@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>پنل سرپرست کل | گروه تئاتر طلوع</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h1, h2 { color: #2196f3; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+        th { background: #2d2d2d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ پنل مدیریت سرپرست</h1>
+        <p>مدیریت کل و نظارت بر رزروها و بازیگران گروه طلوع.</p>
+        <p>📅 تاریخ امروز: {{ today_jalali }}</p>
+
+        <hr style="border-color: #444;">
+
+        <h2>📋 لیست درخواست‌های رزرو اجرا</h2>
+        <table>
+            <tr>
+                <th>نام ثبت‌کننده</th>
+                <th>شهر</th>
+                <th>نمایش انتخابی</th>
+                <th>مبلغ پیشنهادی</th>
+                <th>شماره تماس</th>
+            </tr>
+            {% for res in reservations %}
+            <tr>
+                <td>{{ res.full_name }}</td>
+                <td>{{ res.city }}</td>
+                <td>{{ res.play_title }}</td>
+                <td>{{ res.offered_price }}</td>
+                <td>{{ res.phone }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="color: #888;">رزروی ثبت نشده است.</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2 style="margin-top: 30px;">👥 لیست بازیگران فعال</h2>
+        <table>
+            <tr>
+                <th>نام کاربری / شماره</th>
+                <th>نقش</th>
+                <th>سمت</th>
+            </tr>
+            {% for act in actors %}
+            <tr>
+                <td>{{ act.username }}</td>
+                <td>{{ act.get_role_display }}</td>
+                <td>{{ act.role_description }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="color: #888;">بازیگری یافت نشد.</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br><br>
+        <a href="{% url 'home' %}" style="color: #2196f3; text-decoration: none;">← بازگشت به صفحه اصلی</a>
+    </div>
+</body>
+</html>
