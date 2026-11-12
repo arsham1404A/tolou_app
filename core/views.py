@@ -12,6 +12,7 @@ from .models import (
     Script,
     Show,
     User,
+    AllowedActorPhone,
 )
 from django.contrib import messages
 from django.contrib.auth import login
@@ -116,13 +117,15 @@ def dashboard_view(request):
     auditions = []
     if user.role in ["director_actor", "general_supervisor"] or user.is_superuser:
         auditions = Audition.objects.all().order_by("-created_at")
-        context = {
+ # ساخت کانتکست عمومی برای جلوگیری از خطای ۵۰۰
+    context = {
         "user": user,
         "is_birthday_today": is_birthday_today,
         "today_jalali": f"{today_jalali.year}/{today_jalali.month}/{today_jalali.day}",
         "reservations": reservations,
         "auditions": auditions,
     }
+
     # آپدیت آواتار با ایجکس
     if request.method == "POST" and request.FILES.get("avatar"):
         user.avatar = request.FILES["avatar"]
