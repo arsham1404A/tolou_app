@@ -26,7 +26,23 @@ SECRET_KEY = 'django-insecure-v283gegvn!2h1pws2kk*v=5k%0&l_-nzmpf&qs6ctc4h9a#a2y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['tolou-app.onrender.com', 'localhost', '127.0.0.1']
+# اضافه شدن دامنه‌های آروان و رندر برای جلوگیری از خطای Bad Request (400)
+ALLOWED_HOSTS = [
+    'tlouart.ir',
+    'www.tlouart.ir',
+    'tolou-app.onrender.com',
+    '.onrender.com',
+    '.tlouart.ir',
+    'localhost',
+    '127.0.0.1'
+]
+
+# تنظیمات امنیتی برای پذیرش درخواست‌های ورودی از طریق پروکسی
+CSRF_TRUSTED_ORIGINS = [
+    'https://tlouart.ir',
+    'https://www.tlouart.ir',
+    'https://tolou-app.onrender.com'
+]
 
 
 # Application definition
@@ -135,7 +151,6 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
-
 AUTH_USER_MODEL = 'core.User'
 JAZZMIN_SETTINGS = {
     "site_title": "سامانه تئاتر طلوع",
@@ -145,7 +160,7 @@ JAZZMIN_SETTINGS = {
     "copyright": "گروه فرهنگی هنری طلوع",
     
     "order_with_respect_to": [
- "core.HomeBanner",
+        "core.HomeBanner",
         "core.Actor",
         "core.AllowedActorPhone",
         "core.Play",
