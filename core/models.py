@@ -182,12 +182,13 @@ class Audition(models.Model):
     video_file = models.FileField(upload_to='auditions/videos/', null=True, blank=True, verbose_name="ویدیو ارسالی تست")
     experience = models.TextField(blank=True, null=True, verbose_name="سابقه کاری")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
-class Meta:
+    class Meta:
         verbose_name = "درخواست تست بازیگری"
         verbose_name_plural = "درخواست‌های تست بازیگری"
         
-def __str__(self):
+    def str(self):
         return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}" 
+
 
 # ۸. مدل نمایشنامه‌ها (Play) - با پوستر، تیزر و توضیحات کامل
 class Play(models.Model):
@@ -202,7 +203,7 @@ class Play(models.Model):
         verbose_name = "نمایشنامه"
         verbose_name_plural = "نمایشنامه‌ها"
 
-    def __str__(self):
+    def str(self):
         return self.title
 
 
@@ -218,7 +219,7 @@ class HistoryEvent(models.Model):
         verbose_name = "رویداد تاریخچه"
         verbose_name_plural = "تاریخچه و رویدادها"
 
-    def __str__(self):
+    def str(self):
         return f"{self.year} - {self.title}"
 
 
