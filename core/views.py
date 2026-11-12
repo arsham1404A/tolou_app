@@ -246,13 +246,13 @@ def past_shows_view(request):
 @login_required
 def play_create_view(request):
     if request.user.role not in ["director_actor", "general_supervisor"]:
-        return redirect("dashboard")
+        return redirect("home")
 
     if request.method == "POST":
         form = PlayCreateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect("dashboard")
+            return redirect("home")
     else:
         form = PlayCreateForm()
 
@@ -269,7 +269,7 @@ def upload_actor_archive(request):
             if not photo.caption:
                 photo.caption = request.user.username
             photo.save()
-            return redirect("dashboard")
+            return redirect("home")
     else:
         form = ActorArchiveUploadForm()
 
