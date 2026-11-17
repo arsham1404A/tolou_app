@@ -20,16 +20,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
+            padding: 50px 20px;
             background: url('{% static "images/audition_bg.jpg" %}') no-repeat center center/cover;
             position: relative;
+            perspective: 1000px; /* بستر افکت سه‌بعدی */
+            overflow-x: hidden;
         }
         body::before {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.88);
-            backdrop-filter: blur(6px);
+            background: radial-gradient(circle at center, rgba(9, 14, 11, 0.78) 0%, rgba(0, 0, 0, 0.94) 100%);
+            backdrop-filter: blur(8px);
             z-index: 1;
         }
 
@@ -37,33 +39,55 @@
             position: relative;
             z-index: 2;
             background: rgba(9, 14, 11, 0.95);
-            border: 1px solid rgba(229, 197, 131, 0.3);
-            padding: 35px 30px;
-            border-radius: 20px;
-            max-width: 550px;
+            border: 1px solid rgba(229, 197, 131, 0.4);
+            padding: 40px 35px;
+            border-radius: 24px;
+            max-width: 580px;
             width: 100%;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(229, 197, 131, 0.15);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            animation: fadeInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .container:hover {
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(229, 197, 131, 0.25);
+            border-color: #E5C583;
         }
 
         h2 {
-            font-size: 21px;
+            font-size: 22px;
             color: #E5C583;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            text-shadow: 0 0 12px rgba(229, 197, 131, 0.4);
+            transform: translateZ(20px);
         }
 
         /* استایل بخش شرایط */
         .terms-box {
             background: #122B20;
-            border: 1px solid #52B788;
-            padding: 20px;
-            border-radius: 12px;
+            border: 1px solid rgba(82, 183, 136, 0.5);
+            padding: 22px;
+            border-radius: 14px;
             font-size: 14px;
             color: #CBD5E1;
             line-height: 1.9;
             margin-bottom: 20px;
             max-height: 230px;
             overflow-y: auto;
+            transform: translateZ(10px);
         }
 
         .terms-box ul {
@@ -79,6 +103,7 @@
             font-size: 14px;
             color: #fff;
             cursor: pointer;
+            transform: translateZ(10px);
         }
 
         .checkbox-group input {
@@ -94,95 +119,106 @@
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
+            transform: translateZ(10px);
         }
 
         .form-group label {
             display: block;
             font-size: 13px;
             color: #CBD5E1;
-            margin-bottom: 6px;
+            margin-bottom: 7px;
+            font-weight: 600;
         }
-
-        .form-group input, 
+ .form-group input, 
         .form-group select {
             width: 100%;
             background: #122B20;
-            border: 1px solid #52B788;
+            border: 1px solid rgba(82, 183, 136, 0.5);
             color: #fff;
-            padding: 11px 14px;
-            border-radius: 10px;
+            padding: 12px 15px;
+            border-radius: 12px;
             font-size: 14px;
             outline: none;
-            transition: 0.3s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .form-group input[type="file"] {
-            padding: 9px;
+            padding: 10px;
             background: #0B1913;
             cursor: pointer;
         }
 
         .form-group input:focus, .form-group select:focus {
             border-color: #E5C583;
-            box-shadow: 0 0 10px rgba(229, 197, 131, 0.3);
+            box-shadow: 0 0 15px rgba(229, 197, 131, 0.4);
+            background: #18382b;
+            transform: translateY(-2px);
         }
 
         .action-btn {
             width: 100%;
-            background: #52B788;
+            background: linear-gradient(135deg, #059669, #52B788);
             color: #000;
             border: none;
-            padding: 13px;
-            border-radius: 10px;
-            font-weight: bold;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 800;
             font-size: 15px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             margin-top: 10px;
+            box-shadow: 0 5px 20px rgba(82, 183, 136, 0.4);
+            transform: translateZ(15px);
         }
 
         .action-btn:disabled {
-            background: #2b3e34;
+            background: #1e3328;
             color: #64748b;
             cursor: not-allowed;
+            box-shadow: none;
         }
- .action-btn:hover:not(:disabled) {
+
+        .action-btn:hover:not(:disabled) {
             background: #E5C583;
-            box-shadow: 0 0 15px rgba(229, 197, 131, 0.4);
+            color: #000;
+            box-shadow: 0 0 25px rgba(229, 197, 131, 0.7);
+            transform: translateY(-3px) translateZ(15px);
         }
 
         .notice-text {
             text-align: center;
             font-size: 12px;
             color: #94A3B8;
-            margin-top: 15px;
+            margin-top: 18px;
         }
 
         .back-link {
             display: block;
             text-align: center;
-            margin-top: 15px;
+            margin-top: 18px;
             color: #94A3B8;
             text-decoration: none;
             font-size: 13px;
             transition: 0.3s;
+            transform: translateZ(10px);
         }
         .back-link:hover {
             color: #E5C583;
+            text-shadow: 0 0 10px rgba(229, 197, 131, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="container" id="mainContainer">
         <!-- مرحله اول: شرایط عضویت -->
         <div id="terms-section">
             <h2>شرایط عضویت در گروه تئاتر طلوع 📜</h2>
             <div class="terms-box">
                 <p>برای پیوستن به خانواده بزرگ تئاتر طلوع، رعایت موارد زیر الزامی است:</p>
                 <ul>
-                    <li>التزام عملی به حجاب اسلامی و موازین اخلاقی</li>
+                    <li>التزام عملی به موازین اخلاقی و ارزش‌های گروه</li>
                     <li>علاقه‌مندی واقعی به کار تیمی و روحیه جمعی</li>
                     <li>تعهد کامل به حضور منظم در تمرینات و برنامه‌ها</li>
                     <li>مسئولیت‌پذیری و انضباط در اجرای پروژه‌ها</li>
@@ -194,7 +230,7 @@
                 شرایط بالا را مطالعه کرده و با تمام موارد موافقم.
             </label>
 
-            <button type="button" id="next-btn" class="action-btn" disabled onclick="showFormSection()">مرحله بعد و تکمیل فرم</button>
+            <button type="button" id="next-btn" class="action-btn" disabled onclick="showFormSection()">مرحله بعد و تکمیل فرم ⚡️</button>
         </div>
 
         <!-- مرحله دوم: فرم اطلاعات و ویدیو -->
@@ -213,8 +249,7 @@
                     <label>شماره تماس:</label>
                     <input type="text" name="phone" required placeholder="09123456789">
                 </div>
-
-                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+ <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div>
                         <label>جنسیت:</label>
                         <select name="gender">
@@ -238,7 +273,7 @@
                     <input type="file" name="video_file" accept="video/*" required>
                 </div>
 
-                <button type="submit" class="action-btn">ارسال نهایی درخواست</button>
+                <button type="submit" class="action-btn">ارسال نهایی درخواست 🚀</button>
             </form>
 
             <p class="notice-text">در صورت تایید با شما تماس گرفته خواهد شد.</p>
@@ -247,16 +282,37 @@
         <a href="{% url 'home' %}" class="back-link">← بازگشت به صفحه اصلی</a>
     </div>
 
+    <!-- اسکریپت‌های کنترل مراحل و افکت سه‌بعدی -->
     <script>
         function toggleNextButton() {
             const checkbox = document.getElementById("agree-checkbox");
             const nextBtn = document.getElementById("next-btn");
             nextBtn.disabled = !checkbox.checked;
         }
- function showFormSection() {
+
+        function showFormSection() {
             document.getElementById("terms-section").style.display = "none";
             document.getElementById("form-section").style.display = "block";
         }
+
+        // افکت سه‌بعدی Tilt Effect
+        const container = document.getElementById('mainContainer');
+
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            
+            container.style.transform =` rotateY(${xAxis}deg)` `rotateX``(${-yAxis}deg);`
+        });
+
+        document.addEventListener('mouseleave', () => {
+            container.style.transform = `rotateY(0deg) rotateX(0deg);`
+            container.style.transition = 'transform 0.5s ease';
+        });
+
+        container.addEventListener('mouseenter', () => {
+            container.style.transition = 'none';
+        });
     </script>
 
 </body>

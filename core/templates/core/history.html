@@ -8,138 +8,174 @@
     <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" />
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
-        body { background: #050907; color: #fff; min-height: 100vh; padding: 30px 20px; overflow-x: hidden; }
+        body { 
+            background: #050907; 
+            color: #fff; 
+            min-height: 100vh; 
+            padding: 40px 20px; 
+            overflow-x: hidden; 
+            perspective: 1200px; /* بستر اصلی افکت ۳بعدی */
+            background: radial-gradient(circle at center, rgba(9, 25, 16, 0.6) 0%, rgba(5, 9, 7, 0.98) 100%);
+        }
         
         /* هدر بالای صفحه و لوگوی بدون بک‌گراند */
         .header-section {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            transform: translateZ(20px);
         }
         .site-logo {
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
-            filter: drop-shadow(0 0 15px rgba(0,255,102,0.5));
+            filter: drop-shadow(0 0 20px rgba(0,255,102,0.6));
             margin-bottom: 10px;
+            transition: transform 0.4s ease;
+        }
+        .site-logo:hover {
+            transform: scale(1.08) rotate(3deg);
         }
         .header-title {
             color: #00ff66;
             font-size: 26px;
-            text-shadow: 0 0 12px rgba(0,255,102,0.4);
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(0,255,102,0.4);
         }
 
         /* لایه‌بندی اصلی صفحه: قاب‌های سمت راست، متن وسط، قاب‌های سمت چپ */
         .history-main-layout {
-            max-width: 1300px;
+            max-width: 1350px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: 280px 1fr 280px;
-            gap: 25px;
+            gap: 30px;
             align-items: start;
+            transform-style: preserve-3d;
         }
 
         /* ستون قاب عکس‌های آویز (چپ و راست) */
         .frames-column {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 22px;
+            transform: translateZ(15px);
         }
 
         .hanging-frame {
-            background: rgba(9, 14, 11, 0.9);
-            border: 2px solid #00ff66;
-            border-radius: 12px;
+            background: rgba(9, 14, 11, 0.92);
+            border: 2px solid rgba(0, 255, 102, 0.6);
+            border-radius: 16px;
             overflow: hidden;
-            height: 200px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.8), 0 0 10px rgba(0,255,102,0.2);
+            height: 195px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.85), 0 0 15px rgba(0,255,102,0.25);
             position: relative;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* افکت بند یا گیره آویز بالای قاب */
+        .hanging-frame:hover {
+            border-color: #E5C583;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9), 0 0 25px rgba(229, 197, 131, 0.4);
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        /* افکت گیره یا کلیپس آویز بالای قاب */
         .hanging-frame::before {
             content: '';
             position: absolute;
-            top: -10px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            width: 15px;
-            height: 10px;
-            background: #E5C583;
-            border-radius: 3px;
+            width: 18px;
+            height: 12px;
+            background: linear-gradient(135deg, #E5C583, #b58d3d);
+            border-radius: 4px;
             z-index: 5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
         .hanging-frame img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s ease;
         }
 
-        .hanging-frame img:hover {
-            transform: scale(1.05);
+        .hanging-frame:hover img {
+            transform: scale(1.08);
         }
 
-        /* کادر مرکزی متن تاریخچه (اسکرول‌شونده) */
+        /* کادر مرکزی متن تاریخچه (سه‌بعدی و اسکرول‌شونده) */
         .content-box {
-            background: rgba(9, 14, 11, 0.95);
-            border: 1px solid rgba(0, 255, 102, 0.4);
-            border-radius: 18px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            background: rgba(9, 14, 11, 0.96);
+            border: 1px solid rgba(0, 255, 102, 0.5);
+            border-radius: 22px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.95), 0 0 30px rgba(0,255,102,0.15);
             max-height: 650px;
             overflow-y: auto;
+            transform: translateZ(30px);
+            transition: box-shadow 0.3s ease;
         }
 
-        .content-box::-webkit-scrollbar {
-            width: 6px;
+        .content-box:hover {
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(0,255,102,0.3);
+            border-color: #00ff66;
+        }
+ .content-box::-webkit-scrollbar {
+            width: 7px;
         }
         .content-box::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4);
+            border-radius: 10px;
         }
         .content-box::-webkit-scrollbar-thumb {
             background: #00ff66;
-            border-radius: 3px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #00ff66;
         }
 
         .history-text {
             color: #FFFFFF;
             font-size: 15px;
-            line-height: 2.2;
+            line-height: 2.3;
             text-align: justify;
         }
 
         .history-text p {
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         .history-text strong {
             color: #00ff66;
-            text-shadow: 0 0 8px rgba(0,255,102,0.3);
+            text-shadow: 0 0 8px rgba(0,255,102,0.4);
         }
 
         .highlight-gold {
             color: #E5C583 !important;
+            text-shadow: 0 0 10px rgba(229, 197, 131, 0.4);
         }
 
-        /* دکمه بازگشت */
+        /* دکمه بازگشت مدرن و سه‌بعدی */
         .back-home {
             display: block;
             width: fit-content;
-            margin: 40px auto 0;
+            margin: 45px auto 0;
             color: #00ff66;
             text-decoration: none;
             border: 1px solid #00ff66;
- padding: 10px 25px;
-            border-radius: 12px;
-            transition: 0.3s;
+            padding: 12px 30px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
             font-weight: bold;
-            background: rgba(0, 255, 102, 0.05);
+            background: rgba(0, 255, 102, 0.08);
+            box-shadow: 0 5px 20px rgba(0, 255, 102, 0.2);
+            transform: translateZ(25px);
         }
         .back-home:hover {
             background: #00ff66;
             color: #000;
-            box-shadow: 0 0 15px #00ff66;
+            box-shadow: 0 0 25px #00ff66;
+            transform: translateY(-3px) translateZ(25px);
         }
 
         /* واکنش‌گرا برای موبایل و تبلت */
@@ -150,24 +186,24 @@
             .frames-column {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
+                gap: 12px;
             }
             .hanging-frame {
-                height: 150px;
+                height: 160px;
             }
         }
     </style>
 </head>
-<body>
+<body id="bodyContainer">
 
-    <!-- هدر بالای صفحه: لوگوی بدون بک‌گراند و عنوان -->
+    <!-- هدر بالای صفحه -->
     <div class="header-section">
         <img src="{% static 'images/logo_transparent.png' %}" alt="لوگو گروه طلوع" class="site-logo">
         <h1 class="header-title">📜 تاریخچه و افتخارات گروه تئاتر طلوع</h1>
     </div>
 
-    <!-- ساختار ۳ ستونه: قاب‌های راست، متن وسط، قاب‌های چپ -->
-    <div class="history-main-layout">
+    <!-- ساختار ۳ ستونه -->
+    <div class="history-main-layout" id="mainLayout">
 
         <!-- ۳ عکس سمت راست -->
         <div class="frames-column">
@@ -182,14 +218,13 @@
             </div>
         </div>
 
-        <!-- متن مرکزی با قابلیت اسکرول و متن سفید و بولدشده -->
+        <!-- متن مرکزی اسکرول‌شونده -->
         <div class="content-box">
             <div class="history-text">
                 <p>در محرم‌الحرام سال <strong>۱۳۹۹</strong>، جمعی از جوانان دغدغه‌مند، مؤمن و شیفته‌ی هنر آئینی گرد هم آمدند تا جریانی نو در عرصه روایتگری دینی خلق کنند. این شجره‌ی طیبه در آغاز راه، با همراهی ارزشمند <strong class="highlight-gold">«گروه فرهنگی هنری مذهبی خاک»</strong> و تحت هدایت و کارگردانی <strong class="highlight-gold">استاد تقی‌نژاد</strong> شکل گرفت و نخستین گام‌های خود را استوار برداشت.</p>
                 
                 <p>بقا و بالندگی امروز این مجموعه، حاصل همت والا و مدیریت بی‌دریغ بزرگانی است که از نخستین روزها، خادمانه پای این علم ایستادند؛ قدردان تلاش‌های ماندگار <strong class="highlight-gold">جناب آقای صالح‌فر</strong> (سرپرست محترم گروه) و همراهان گران‌قدر، <strong class="highlight-gold">جناب آقای کارگری</strong>، <strong class="highlight-gold">جناب آقای شهابی</strong> و <strong class="highlight-gold">جناب آقای قارزی</strong> هستیم که با درایت و پشتکار خود، <strong>«طلوع»</strong> را به این جایگاه والا رساندند.</p>
-                
-                <p>امروز، با گذشت <strong>۶ سال</strong> مسیر پرفراز و نشیب اما افتخارآفرین، <strong>«طلوع»</strong> مرزها را درنوردیده و به عنوان یک مجموعه بین‌المللی در پهنه‌ی ایران اسلامی و <strong class="highlight-gold">کشور عراق</strong>، اجرای <strong class="highlight-gold">بیش از ۱۰۰۰ نمایش فاخر</strong> را در کارنامه‌ی درخشان خود ثبت کرده است.</p>
+ <p>امروز، با گذشت <strong>۶ سال</strong> مسیر پرفراز و نشیب اما افتخارآفرین، <strong>«طلوع»</strong> مرزها را درنوردیده و به عنوان یک مجموعه بین‌المللی در پهنه‌ی ایران اسلامی و <strong class="highlight-gold">کشور عراق</strong>، اجرای <strong class="highlight-gold">بیش از ۱۰۰۰ نمایش فاخر</strong> را در کارنامه‌ی درخشان خود ثبت کرده است.</p>
                 
                 <p>آرمان همیشگی ما این است که با بهره‌گیری از توان جوانان مؤمن و هنرمند، مرآت تجلی خاطر شریف <strong class="highlight-gold">حضرت صاحب‌الزمان (عجل‌الله تعالی فرجه الشریف)</strong> باشیم و با زبان رسای هنر، مظلومیت و معصومیت آل‌الله (علیهم‌السلام) را به گوش جهانیان برسانیم.</p>
             </div>
@@ -211,6 +246,27 @@
     </div>
 
     <a href="{% url 'home' %}" class="back-home">← بازگشت به صفحه اصلی</a>
+
+    <!-- اسکریپت پیشرفته افکت ۳بعدی (Tilt Effect) برای کل صفحه تاریخچه -->
+    <script>
+        const layout = document.getElementById('mainLayout');
+
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 35;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 35;
+            
+            layout.style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg);`
+        });
+
+        document.addEventListener('mouseleave', () => {
+            layout.style.transform = `rotateY(0deg) rotateX(0deg);`
+            layout.style.transition = 'transform 0.5s ease';
+        });
+
+        layout.addEventListener('mouseenter', () => {
+            layout.style.transition = 'none';
+        });
+    </script>
 
 </body>
 </html>

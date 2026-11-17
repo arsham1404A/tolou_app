@@ -17,108 +17,190 @@
             background-color: #000000;
             color: #ffffff;
             min-height: 100vh;
-            padding-bottom: 90px;
+            padding-bottom: 60px;
+            overflow-x: hidden;
         }
 
-        /* هدر سایبرپانکی بالا با لوگو و عنوان گالری */
+        /* پس‌زمینه انیمیشنی ملایم سایبرپانک */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 20%, rgba(82, 183, 136, 0.05) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* هدر سایبرپانکی بالا */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 35px;
-            background: #090E0B;
-            border-bottom: 1px solid rgba(0, 255, 204, 0.3);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            padding: 18px 35px;
+            background: rgba(9, 14, 11, 0.95);
+            border-bottom: 1px solid rgba(82, 183, 136, 0.35);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            animation: slideRight 0.8s ease-out;
+        }
+        @keyframes slideRight {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         .logo-area img {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
-            border-radius: 10px;
-            border: 1px solid #00ffcc;
-            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #52B788;
+            background: transparent;
             padding: 2px;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+            box-shadow: 0 0 12px rgba(82, 183, 136, 0.5);
         }
         .logo-area h1 {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 800;
-            color: #00ffcc;
-            text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+            color: #52B788;
+            text-shadow: 0 0 10px rgba(82, 183, 136, 0.6);
             letter-spacing: 0.5px;
         }
         .back-btn {
             color: #E5C583;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             border: 1px solid rgba(229, 197, 131, 0.4);
-            padding: 6px 14px;
-            border-radius: 8px;
-            transition: 0.3s;
+            padding: 7px 16px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            animation: slideLeft 0.8s ease-out;
+        }
+        @keyframes slideLeft {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         .back-btn:hover {
             background: #E5C583;
             color: #000;
-            box-shadow: 0 0 10px rgba(229, 197, 131, 0.5);
+            box-shadow: 0 0 15px rgba(229, 197, 131, 0.7);
+            transform: translateY(-2px);
         }
 
         .container {
-            max-width: 1100px;
-            margin: 30px auto;
+            max-width: 1150px;
+            margin: 40px auto;
             padding: 0 20px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 35px;
         }
 
-        /* گرید آلبوم‌ها و عکس‌ها */
+        /* فیلد جستجوی زنده (Live Search) با افکت فوکوس مدرن */
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .search-input {
+ width: 100%;
+            padding: 14px 22px;
+            background: rgba(9, 14, 11, 0.95);
+            border: 1px solid rgba(82, 183, 136, 0.4);
+            border-radius: 35px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        }
+        .search-input:focus {
+            border-color: #52B788;
+            box-shadow: 0 0 20px rgba(82, 183, 136, 0.4);
+            background: rgba(18, 43, 32, 0.4);
+            transform: scale(1.01);
+        }
+
+        /* گرید آلبوم‌ها با انیمیشن ورود آبشاری */
         .albums-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 25px;
         }
         .album-card {
-            background: #090E0B;
-            border: 1px solid rgba(0, 255, 204, 0.25);
-            border-radius: 16px;
+            background: rgba(9, 14, 11, 0.9);
+            border: 1px solid rgba(82, 183, 136, 0.3);
+            border-radius: 18px;
             overflow: hidden;
             text-decoration: none;
             color: #fff;
-            transition: all 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
             display: flex;
             flex-direction: column;
+            opacity: 0;
+            transform: translateY(25px);
+            animation: fadeInCards 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: transform;
         }
+
+        @keyframes fadeInCards {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .album-card:hover {
-            border-color: #00ffcc;
+            border-color: #52B788;
             background: #122B20;
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            box-shadow: 0 15px 35px rgba(82, 183, 136, 0.3);
+        }
+
+        .album-cover-wrapper {
+            overflow: hidden;
+            height: 215px;
+            background: #000;
+            position: relative;
         }
         .album-cover {
             width: 100%;
-            height: 210px;
+            height: 100%;
             object-fit: cover;
-            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-            transition: transform 0.5s ease;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .album-card:hover .album-cover {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
+
         .album-info {
-            padding: 20px;
+            padding: 22px;
             text-align: center;
         }
         .album-info h3 {
-            font-size: 15px;
+            font-size: 16px;
             color: #E5C583;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 700;
+            transition: color 0.3s;
+        }
+        .album-card:hover .album-info h3 {
+            color: #52B788;
         }
         .album-info p {
             font-size: 12px;
@@ -129,59 +211,37 @@
             text-align: center;
             color: #94A3B8;
             font-size: 14px;
-            grid-column: span 12;
-            padding: 50px;
-            background: #090E0B;
-            border: 1px dashed rgba(0, 255, 204, 0.3);
-            border-radius: 16px;
-        }
- /* منوی شناور پایین */
-        .floating-footer-menu {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            grid-column: 1 / -1;
+            padding: 60px;
             background: rgba(9, 14, 11, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(82, 183, 136, 0.4);
-            padding: 10px 25px;
-            border-radius: 40px;
-            display: flex;
-            gap: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-            z-index: 1000;
-        }
-        .floating-footer-menu a {
-            color: #CBD5E1;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-        .floating-footer-menu a:hover,
-        .floating-footer-menu a.active {
-            color: #52B788;
-            text-shadow: 0 0 10px rgba(82, 183, 136, 0.5);
+            border: 1px dashed rgba(82, 183, 136, 0.4);
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body>
 
-    <!-- هدر اختصاصی گالری با لوگو و متن ظریف و بولد -->
+    <!-- هدر اختصاصی گالری -->
     <header>
         <div class="logo-area">
             <img src="{% static 'images/logo.png' %}" alt="لوگو طلوع">
             <h1>گالری طلوع</h1>
         </div>
-        <a href="{% url 'home' %}" class="back-btn">← بازگشت</a>
+        <a href="{% url 'home' %}" class="back-btn">← بازگشت به خانه</a>
     </header>
 
     <div class="container">
-        <div class="albums-grid">
+        <!-- فیلد جستجوی زنده (Live Search) -->
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 جستجوی سریع در آلبوم‌ها..." onkeyup="filterAlbums()">
+        </div>
+
+        <div class="albums-grid" id="albumsGrid">
             {% if albums %}
                 {% for album in albums %}
-                    <a href="{% url 'gallery_detail' album.id %}" class="album-card">
-                        <div style="overflow: hidden; height: 210px; background: #000;">
+                    <a href="{% url 'gallery_detail' album.id %}" class="album-card" style="animation-delay: {{ forloop.counter0|add:1|slugify }}100ms;">
+ <div class="album-cover-wrapper">
                             {% if album.cover_image %}
                                 <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="album-cover" onerror="this.onerror=null; this.src='{% static 'images/logo.png' %}';">
                             {% else %}
@@ -204,13 +264,44 @@
         </div>
     </div>
 
-    <!-- منوی شناور پایین -->
-    <div class="floating-footer-menu">
-        <a href="{% url 'history' %}">تاریخچه</a>
-        <a href="{% url 'reservation_form' %}">رزرو اجرا</a>
-        <a href="{% url 'home' %}">صفحه اصلی</a>
-        <a href="{% url 'help_group' %}">کمک به گروه</a>
-    </div>
+    <!-- کدهای پیشرفته و بهینه‌سازی شده جاوا اسکریپت -->
+    <script>
+        // ۱. تابع جستجوی زنده با انیمیشن محو شدن روان
+        function filterAlbums() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase().trim();
+            const grid = document.getElementById('albumsGrid');
+            const cards = grid.getElementsByClassName('album-card');
+
+            for (let i = 0; i < cards.length; i++) {
+                const title = cards[i].getElementsByTagName('h3')[0];
+                if (title) {
+                    const textValue = title.textContent || title.innerText;
+                    if (textValue.toLowerCase().indexOf(filter) > -1) {
+                        cards[i].style.display = "flex";
+                        cards[i].style.opacity = "1";
+                    } else {
+                        cards[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // ۲. افکت تعاملی حرکت موس روی کارت‌ها (Tilt Effect) با محاسبات دقیق
+        document.querySelectorAll('.album-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                card.style.transform = `translateY(-8px) rotateX(${-y / 15}deg) rotateY(${x / 15}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0px) rotateX(0deg) rotateY(0deg)';
+            });
+        });
+    </script>
 
 </body>
 </html>

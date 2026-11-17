@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>کمک به گروه تئاتر طلوع</title>
+    <title>تئاتر طلوع | حمایت مالی</title>
     <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
         * {
@@ -21,10 +21,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 30px 20px;
+            background: radial-gradient(circle at center, rgba(18, 43, 32, 0.4) 0%, rgba(0, 0, 0, 0.95) 100%);
+            perspective: 1000px; /* بستر افکت سه‌بعدی */
+            overflow-x: hidden;
         }
 
         .container {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,29 +36,46 @@
             max-width: 500px;
             width: 100%;
             text-align: center;
+            background: rgba(9, 14, 11, 0.9);
+            border: 1px solid rgba(82, 183, 136, 0.35);
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(82, 183, 136, 0.15);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(82, 183, 136, 0.3);
+            border-color: #52B788;
         }
 
         .page-title {
-            font-size: 18px;
+            font-size: 20px;
             color: #E5C583;
             font-weight: 700;
             margin-bottom: 5px;
+            text-shadow: 0 0 12px rgba(229, 197, 131, 0.4);
+            transform: translateZ(20px);
         }
 
-        /* استایل عکس کارت بدون بک‌گراند اضافی */
+        /* استایل عکس کارت با قابلیت حرکت ۳بعدی و بدون بک‌گراند */
         .card-img-wrapper {
             width: 100%;
             display: flex;
             justify-content: center;
+            transform: translateZ(35px); /* برجسته‌تر شدن کارت نسبت به بقیه اجزا */
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8));
+            transition: transform 0.3s ease;
         }
+        
         .card-img {
             width: 100%;
-            max-width: 420px;
+            max-width: 380px;
             height: auto;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.2);
-            border: 1px solid rgba(82, 183, 136, 0.4);
             object-fit: contain;
+            border: 1px solid rgba(229, 197, 131, 0.2);
         }
 
         /* بخش دکمه کپی شماره کارت */
@@ -64,65 +85,73 @@
             gap: 12px;
             width: 100%;
             align-items: center;
+            transform: translateZ(15px);
         }
 
         .card-number-text {
-            font-size: 16px;
-            letter-spacing: 2px;
+            font-size: 18px;
+            letter-spacing: 3px;
             color: #52B788;
-            font-weight: 600;
+            font-weight: 700;
+            background: #122B20;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px dashed rgba(82, 183, 136, 0.5);
+            width: 100%;
+            max-width: 320px;
         }
 
         .copy-btn {
-            background: linear-gradient(135deg, #52B788, #2d6a4f);
+            background: linear-gradient(135deg, #059669, #52B788);
             color: #000;
             border: none;
-            padding: 12px 25px;
+            padding: 14px 25px;
             border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 5px 20px rgba(82, 183, 136, 0.3);
+            box-shadow: 0 5px 20px rgba(82, 183, 136, 0.4);
             width: 100%;
             max-width: 300px;
             justify-content: center;
         }
 
         .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(82, 183, 136, 0.5);
-            background: linear-gradient(135deg, #74c69d, #52B788);
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(229, 197, 131, 0.7);
+            background: #E5C583;
+            color: #000;
         }
-
-        .back-link {
+ .back-link {
             color: #94A3B8;
             text-decoration: none;
             font-size: 13px;
-            margin-top: 15px;
+            margin-top: 10px;
             transition: color 0.3s;
+            transform: translateZ(10px);
         }
         .back-link:hover {
-            color: #fff;
+            color: #E5C583;
+            text-shadow: 0 0 8px rgba(229, 197, 131, 0.4);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="container" id="tiltCard">
         <h2 class="page-title">حمایت مالی از گروه فرهنگی هنری طلوع ⚡️</h2>
 
-        <!-- عکس کارت بانکی -->
+        <!-- عکس کارت بانکی شناور -->
         <div class="card-img-wrapper">
-            <img src="{% static 'images/card.png' %}" alt="کارت بانکی ملت" class="card-img" id="cardImage">
+            <img src="{% static 'images/card.png' %}" alt="کارت بانکی" class="card-img" id="cardImage">
         </div>
 
         <!-- دکمه کپی شماره کارت -->
         <div class="copy-section">
-            <!-- شماره کارت رو دقیق اینجا نوشتم تا قابل کپی باشه -->
             <span class="card-number-text" id="cardNumber">6104338673743064</span>
             
             <button class="copy-btn" onclick="copyCardNumber()">
@@ -132,10 +161,11 @@
 
         <a href="{% url 'home' %}" class="back-link">← بازگشت به صفحه اصلی</a>
     </div>
- <script>
+
+    <!-- اسکریپت پیشرفته افکت سه‌بعدی و کپی شماره کارت -->
+    <script>
         function copyCardNumber() {
-            // شماره کارت بدون خط تیره یا با خط تیره (هر مدلی که راحت تری، اینجا متن داخل span رو می‌گیره)
-            const cardNum = "6104610461046104"; // بدون فاصله یا خط تیره برای واریز راحت‌تر
+            const cardNum = "6104338673743064"; // شماره کارت دقیق و درست
             navigator.clipboard.writeText(cardNum).then(() => {
                 const btn = document.querySelector('.copy-btn');
                 btn.innerHTML = "شماره کارت کپی شد! ✅";
@@ -143,12 +173,31 @@
                 
                 setTimeout(() => {
                     btn.innerHTML = "📋 کپی کردن شماره کارت";
-                    btn.style.background = "linear-gradient(135deg, #52B788, #2d6a4f)";
+                    btn.style.background = "linear-gradient(135deg, #059669, #52B788)";
                 }, 3000);
             }).catch(err => {
                 alert("کپی کردن با خطا مواجه شد.");
             });
         }
+
+        // افکت سه‌بعدی Tilt Effect برای باکس و کارت
+        const container = document.getElementById('tiltCard');
+
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 20;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 20;
+            
+            container.style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg);`
+        });
+
+        document.addEventListener('mouseleave', () => {
+            container.style.transform =` rotateY(0deg) rotateX(0deg);`
+            container.style.transition = 'transform 0.5s ease';
+        });
+
+        container.addEventListener('mouseenter', () => {
+            container.style.transition = 'none';
+        });
     </script>
 
 </body>

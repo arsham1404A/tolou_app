@@ -1,0 +1,237 @@
+ {% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تئاتر طلوع | گزارش مشکلات تجهیزات</title>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+        }
+        body {
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 20px;
+            background: url('{% static "images/issue_bg.jpg" %}') no-repeat center center/cover;
+            position: relative;
+            perspective: 1000px;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(9, 14, 11, 0.78) 0%, rgba(0, 0, 0, 0.94) 100%);
+            backdrop-filter: blur(8px);
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            background: rgba(9, 14, 11, 0.95);
+            border: 1px solid rgba(82, 183, 136, 0.4);
+            padding: 40px 35px;
+            border-radius: 24px;
+            max-width: 580px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(82, 183, 136, 0.2);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            animation: fadeInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .container:hover {
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(82, 183, 136, 0.35);
+            border-color: #52B788;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #E5C583;
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 0 0 12px rgba(229, 197, 131, 0.4);
+            transform: translateZ(20px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            transform: translateZ(10px);
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #CBD5E1;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            background: #122B20;
+            border: 1px solid rgba(82, 183, 136, 0.5);
+            color: #fff;
+            padding: 13px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 110px;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: #E5C583;
+            box-shadow: 0 0 15px rgba(229, 197, 131, 0.4);
+            background: #18382b;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #059669, #52B788);
+            color: #000;
+border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 5px 20px rgba(82, 183, 136, 0.4);
+            transform: translateZ(15px);
+        }
+
+        .submit-btn:hover {
+            background: #E5C583;
+            color: #000;
+            box-shadow: 0 0 25px rgba(229, 197, 131, 0.7);
+            transform: translateY(-3px) translateZ(15px);
+        }
+
+        .notice-text {
+            text-align: center;
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+            transform: translateZ(10px);
+        }
+        .back-link:hover {
+            color: #E5C583;
+            text-shadow: 0 0 10px rgba(229, 197, 131, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <h2>گزارش مشکل و نقص تجهیزات ⚠️</h2>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>نام گزارش‌دهنده (عضو فنی / عوامل):</label>
+                <input type="text" name="reporter_name" required placeholder="مثال: آرشام">
+            </div>
+
+            <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>بخش مربوطه:</label>
+                    <select name="department">
+                        <option value="سیستم صوت">سیستم صوت و صدا</option>
+                        <option value="نورپردازی">نورپردازی</option>
+                        <option value="دکور و صحنه">دکور و صحنه</option>
+                        <option value="تدارکات و لباس">تدارکات و لباس</option>
+                    </select>
+                </div>
+                <div>
+                    <label>سطح اهمیت / اورژانسی:</label>
+                    <select name="priority">
+                        <option value="عادی">عادی</option>
+                        <option value="متوسط">متوسط</option>
+                        <option value="فوری و بحرانی">فوری و بحرانی 🚨</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>عنوان قطعه یا تجهیز معیوب:</label>
+                <input type="text" name="equipment_name" required placeholder="مثال: میکروفون بی‌سیم شماره ۲ / پروژکتور سالن">
+            </div>
+
+            <div class="form-group">
+                <label>شرح کامل مشکل:</label>
+                <textarea name="description" required placeholder="جزئیات خرابی، نحوه بروز مشکل و وضعیت فعلی تجهیز را شرح دهید..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">ثبت و ارسال گزارش به سرپرست ⚡️</button>
+        </form>
+
+        <p class="notice-text">گزارش شما مستقیماً به بخش فنی گروه ارسال خواهد شد.</p>
+        <a href="{% url 'home' %}" class="back-link">← بازگشت به صفحه اصلی</a>
+    </div>
+
+    <!-- اسکریپت افکت سه‌بعدی (3D Tilt Effect) -->
+    <script>
+        const container = document.getElementById('mainContainer');
+
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            
+            container.style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg);`
+        });
+
+        document.addEventListener('mouseleave', () => {
+            container.style.transform = `rotateY(0deg) rotateX(0deg);`
+            container.style.transition = 'transform 0.5s ease';
+        });
+
+        container.addEventListener('mouseenter', () => {
+            container.style.transition = 'none';
+        });
+    </script>
+
+</body>
+</html>

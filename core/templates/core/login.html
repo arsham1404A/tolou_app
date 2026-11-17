@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سامانه جامع تئاتر طلوع</title>
+    <title>ورود عوامل | سامانه تئاتر طلوع</title>
     <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
         * {
@@ -21,24 +21,53 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* افکت انیمیشن ذرات یا پس‌زمینه متحرک درخشان */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(82, 183, 136, 0.08) 0%, transparent 60%);
+            animation: rotateBg 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes rotateBg {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .auth-container {
             display: flex;
             width: 950px;
-            height: 580px; /* افزایش ارتفاع کمی برای جادادن فیلد پسورد */
-            background: #090E0B;
-            border: 1px solid rgba(82, 183, 136, 0.3);
-            border-radius: 18px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.95);
+            height: 540px;
+            background: rgba(9, 14, 11, 0.95);
+            border: 1px solid rgba(82, 183, 136, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(82, 183, 136, 0.15);
             overflow: hidden;
+            z-index: 1;
+            animation: fadeInCard 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        /* سمت راست: پس‌زمینه عکس bg.jpg از مسیر استاتیک اصلی */
+        @keyframes fadeInCard {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* سمت راست: پس‌زمینه عکس و انیمیشن آرام */
         .auth-brand {
             flex: 1.1;
             background-color: #122B20;
-            background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
+            background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), 
                               url('{% static "images/bg.jpg" %}');
             background-position: center;
             background-size: cover;
@@ -48,12 +77,19 @@
             flex-direction: column;
             justify-content: space-between;
             border-left: 1px solid rgba(82, 183, 136, 0.25);
+            position: relative;
         }
 
         .brand-header {
             display: flex;
             align-items: center;
             gap: 14px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .brand-logo {
@@ -77,6 +113,12 @@
             margin: auto 0;
             border-right: 3px solid #E5C583;
             padding-right: 18px;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .brand-quote p {
@@ -91,155 +133,125 @@
             font-size: 11px;
             color: #94A3B8;
         }
-
-        /* سمت چپ: فرم‌ها */
+ /* سمت چپ: فرم ورود عوامل با انیمیشن ورود */
         .auth-form-side {
             flex: 1;
-            padding: 30px 40px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             background: #090E0B;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .form-header {
-            margin-bottom: 18px;
+            margin-bottom: 25px;
         }
 
         .form-header h2 {
-            font-size: 22px;
-            color: #fff;
+            font-size: 24px;
+            color: #E5C583;
             margin-bottom: 6px;
         }
 
         .form-header p {
-            font-size: 12px;
-            color: #94A3B8;
-        }
-
-        .tab-menu {
-            display: flex;
-            background: #000000;
-            border: 1px solid rgba(82, 183, 136, 0.25);
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 18px;
-        }
-
-        .tab-item {
-            flex: 1;
-            padding: 10px 0;
-            text-align: center;
-            background: transparent;
-            border: none;
-            color: #94A3B8;
             font-size: 13px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            color: #94A3B8;
         }
 
-        .tab-item.active {
-            background: #2D6A4F;
-            color: #fff;
-        }
-
-        .form-panel {
-            display: none;
-        }
-
-        .form-panel.active {
-            display: block;
-        }
- .input-group {
-            margin-bottom: 14px;
+        .input-group {
+            margin-bottom: 18px;
         }
 
         .input-group label {
             display: block;
-            font-size: 12px;
-            color: #CBD5E1;
-            margin-bottom: 6px;
+            font-size: 13px;
+            color: #52B788;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .text-input {
             width: 100%;
-            padding: 10px 14px;
+            padding: 12px 16px;
             background: #000000;
             border: 1px solid rgba(82, 183, 136, 0.3);
-            border-radius: 10px;
+            border-radius: 12px;
             color: #ffffff;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
 
         .text-input:focus {
             border-color: #52B788;
+            box-shadow: 0 0 12px rgba(82, 183, 136, 0.3);
+            transform: translateY(-1px);
         }
 
         .submit-btn {
             width: 100%;
-            padding: 12px;
-            background: #2D6A4F;
-            color: #ffffff;
+            padding: 13px;
+            background: linear-gradient(135deg, #2D6A4F, #52B788);
+            color: #000000;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 5px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(45, 106, 79, 0.4);
         }
 
         .submit-btn:hover {
-            background: #40916C;
-        }
-
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 12px;
-            background: #111815;
-            border: 1px solid rgba(82, 183, 136, 0.3);
-            border-radius: 10px;
+            background: linear-gradient(135deg, #40916C, #52B788);
+            box-shadow: 0 6px 20px rgba(82, 183, 136, 0.6);
+            transform: translateY(-2px);
             color: #ffffff;
-            font-size: 14px;
-            text-decoration: none;
-            transition: background 0.3s;
         }
 
-        .google-btn:hover {
-            background: #1B2E24;
-        }
-
-        .desc-text {
-            font-size: 13px;
-            color: #94A3B8;
-            margin-bottom: 20px;
-            line-height: 1.8;
-        }
-
-        /* استایل پیام‌های ارور یا موفقیت */
-        .msg {
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            margin-bottom: 14px;
+        .back-link {
+            display: block;
             text-align: center;
+            margin-top: 22px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
         }
-        .msg.error { background: rgba(255, 0, 0, 0.2); border: 1px solid rgba(255, 0, 0, 0.4); color: #ff8888; }
-        .msg.success { background: rgba(0, 255, 204, 0.2); border: 1px solid rgba(0, 255, 204, 0.4); color: #00ffcc; }
+
+        .back-link:hover {
+            color: #E5C583;
+        }
+
+        /* پیام‌های خطا یا موفقیت */
+        .msg {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            text-align: center;
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .msg.error { background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.4); color: #F87171; }
+        .msg.success { background: rgba(82, 183, 136, 0.2); border: 1px solid rgba(82, 183, 136, 0.4); color: #52B788; }
     </style>
 </head>
 <body>
 
     <div class="auth-container">
-        <!-- سمت راست: برند و نقل‌قول -->
+        <!-- سمت راست: برند و نقل‌قول با افکت گرافیکی -->
         <div class="auth-brand">
             <div class="brand-header">
                 <img src="{% static 'images/logo.png' %}" alt="لوگو" class="brand-logo">
@@ -249,84 +261,39 @@
                 <p>تئاتر، تجلی‌گاه رویش اندیشه‌ها و هنر ماندگار است.</p>
             </div>
             <div class="brand-footer">
-                سامانه جامع مدیریت و رزرو اجراها © 2026
+                سامانه جامع مدیریت و پشت‌صحنه گروه طلوع © 2026
             </div>
         </div>
 
-        <!-- سمت چپ: فرم‌ها -->
+        <!-- سمت چپ: فرم ورود عوامل -->
         <div class="auth-form-side">
             <div class="form-header">
-                <h2>ورود به سامانه</h2>
-                <p>لطفاً نقش خود را برای ورود انتخاب کنید</p>
+                <h2>ورود پشت‌صحنه ⚡️</h2>
+                <p>مخصوص بازیگران، کارگردان و عوامل اجرایی گروه</p>
             </div>
-
-            <!-- نمایش پیام‌های جنگو (مثل ارور پسورد اشتباه) -->
+ <!-- نمایش پیام‌های جنگو -->
             {% if messages %}
                 {% for message in messages %}
                     <div class="msg {{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
 
-            <!-- منوی تب‌ها -->
-            <div class="tab-menu">
-                <button type="button" class="tab-item active" onclick="switchTab('actor')">ورود عوامل و بازیگران</button>
-                <button type="button" class="tab-item" onclick="switchTab('user')">کاربران عادی / تماشاگران</button>
-            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    <label for="phone_number">شماره همراه</label>
+                    <input type="text" id="phone_number" name="phone_number" class="text-input" placeholder="09123456789" required autocomplete="tel">
+                </div>
+                <div class="input-group">
+                    <label for="password">رمز عبور اختصاصی</label>
+                    <input type="password" id="password" name="password" class="text-input" placeholder="رمز عبور خود را وارد کنید" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="submit-btn">ورود به پنل عوامل 🎭</button>
+            </form>
 
-            <!-- پنل عوامل (به‌روزرسانی شده با شماره و رمز عبور) -->
-            <div id="panel-actor" class="form-panel active">
-                <form method="POST">
-
-                    {% csrf_token %}
-                    <div class="input-group">
-                        <label for="phone_number">شماره همراه</label>
-                        <input type="text" id="phone_number" name="phone_number" class="text-input" placeholder="09123456789" required autocomplete="off">
-                    </div>
-                    <div class="input-group">
-                        <label for="password">رمز عبور اختصاصی</label>
-                        <input type="password" id="password" name="password" class="text-input" placeholder="رمز عبور خود را وارد کنید" required autocomplete="current-password">
-                    </div>
-                    <button type="submit" class="submit-btn">ورود به پشت‌صحنه ⚡️</button>
-                </form>
-            </div>
-
-            <!-- پنل کاربران عادی -->
-            <div id="panel-user" class="form-panel">
-                <p class="desc-text">
-                    جهت دسترسی به رزرو بلیط و بخش‌های عمومی، با حساب گوگل خود وارد شوید.
-                </p>
-                <a href="{% url 'google_login_view' %}" class="google-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.23 24 12 24z"/>
-                        <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.85 0 11.7c0 1.85.43 3.58 1.18 5.1l4.09-2.56z"/>
-                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
-                    </svg>
-                    اتصال امن از طریق گوگل
-                </a>
-            </div>
-
+            <a href="{% url 'home' %}" class="back-link">← بازگشت به صفحه اصلی سامانه</a>
         </div>
     </div>
 
-    <script>
-        function switchTab(role) {
-            const actorP = document.getElementById('panel-actor');
-            const userP = document.getElementById('panel-user');
-            const tabs = document.querySelectorAll('.tab-item');
-
-            tabs.forEach(t => t.classList.remove('active'));
-
-            if(role === 'actor') {
-                actorP.classList.add('active');
-                userP.classList.remove('active');
-                tabs[0].classList.add('active');
-            } else {
-                userP.classList.add('active');
-                actorP.classList.remove('active');
-                tabs[1].classList.add('active');
-            }
-        }
-    </script>
 </body>
 </html>

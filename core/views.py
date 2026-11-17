@@ -1,3 +1,5 @@
+import math
+from PIL import Image
 import jdatetime
 from .forms import ActorArchiveUploadForm, PlayCreateForm
 from .models import (
@@ -13,9 +15,10 @@ from .models import (
     Show,
     User,
     AllowedActorPhone,
+    TechnicalIssue,
 )
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -66,6 +69,14 @@ def actor_login(request):
     return render(request, "core/login.html")
 
 
+# ۱.الف - خروج از حساب کاربری
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.info(request, "از حساب کاربری خارج شدید.")
+    return redirect("home")
+
+
 # ۲. ویوی ورود کاربران عادی با اکانت گوگل
 def google_login_view(request):
     return redirect("home")
@@ -83,9 +94,9 @@ def home_view(request):
     return render(request, "core/home.html", context)
 
 
-# ۴. داشبورد و پروفایل هوشمند (با قابلیت تبریک تولد شمسی آنلاین و پنل‌های تفکیک‌شده)
+# ۴. پروفایل هوشمند و مدیریت پنل‌ها
 @login_required
-def dashboard_view(request):
+def profile_view(request):
     user = request.user
 
     # دریافت تاریخ امروز به صورت شمسی و آنلاین از سیستم
@@ -108,22 +119,24 @@ def dashboard_view(request):
 
     # اطلاعات پایه پنل‌ها
     reservations = []
-    if (
-        user.role in ["general_supervisor", "women_supervisor"]
-        or user.is_superuser
-    ):
+    if user.role in ["general_supervisor", "women_supervisor"] or user.is_superuser:
         reservations = Reservation.objects.all().order_by("-created_at")
 
     auditions = []
     if user.role in ["director_actor", "general_supervisor"] or user.is_superuser:
         auditions = Audition.objects.all().order_by("-created_at")
- # ساخت کانتکست عمومی برای جلوگیری از خطای ۵۰۰
+ # گزارش مشکلات تجهیزات برای سرپرست
+    technical_issues = []
+    if user.role in ["general_supervisor", "women_supervisor"] or user.is_superuser:
+        technical_issues = TechnicalIssue.objects.all().order_by("-created_at")
+
     context = {
         "user": user,
         "is_birthday_today": is_birthday_today,
         "today_jalali": f"{today_jalali.year}/{today_jalali.month}/{today_jalali.day}",
         "reservations": reservations,
         "auditions": auditions,
+        "technical_issues": technical_issues,
     }
 
     # آپدیت آواتار با ایجکس
@@ -132,24 +145,36 @@ def dashboard_view(request):
         user.save()
         return JsonResponse({"status": "success", "avatar_url": user.avatar.url})
 
-    # تفکیک رندر بر اساس نقش گروه طلوع
-    if user.role == "director_actor":
-        context["plays"] = Play.objects.all()
-        return render(request, "core/director_panel.html", context)
-    elif user.role in ["general_supervisor", "women_supervisor"]:
-        context["actors"] = User.objects.filter(role="actor")
-        return render(request, "core/supervisor_panel.html", context)
-    else:
-        context["my_photos"] = GalleryPhoto.objects.filter(
-            caption__icontains=user.username
-        )
-        return render(request, "core/actor_panel.html", context)
+    return render(request, "core/profile.html", context)
 
 
-# 4.1 ویوی پروفایل اختصاصی (برای مچ شدن با urls.py)
+# ۴.ب - ثبت بازیگر جدید توسط کارگردان یا سرپرست
 @login_required
-def profile_view(request):
-    return render(request, "core/profile.html", {"user": request.user})
+def add_actor_view(request):
+    if request.user.role not in ["director_actor", "general_supervisor", "women_supervisor"] and not request.user.is_superuser:
+        return redirect("home")
+
+    if request.method == "POST":
+        full_name = request.POST.get("full_name")
+        phone_number = request.POST.get("phone_number")
+        password = request.POST.get("password")
+        role = request.POST.get("role", "actor")
+        role_description = request.POST.get("role_description", "")
+
+        if phone_number and password:
+            AllowedActorPhone.objects.create(
+                full_name=full_name,
+                phone_number=phone_number,
+                plain_password=password,
+                role=role,
+                role_description=role_description
+            )
+            messages.success(request, f"بازیگر {full_name} با موفقیت ثبت شد.")
+            return redirect("profile")
+        else:
+            messages.error(request, "شماره همراه و رمز عبور الزامی است.")
+
+    return render(request, "core/add_actor.html")
 
 
 # ۵. ویوی نمایشنامه‌ها
@@ -164,24 +189,75 @@ def history_view(request):
     return render(request, "core/history.html", {"events": events})
 
 
-# ۷. ویوی گالری و آرشیو تصاویر
+# ۷. ویوی گالری و آرشیو تصاویر (همراه با هوش مصنوعی و آپلود عکاس)
 def gallery_list_view(request):
     albums = GalleryAlbum.objects.all().order_by("-created_at")
     return render(request, "core/gallery_list.html", {"albums": albums})
 
 
+def calculate_image_similarity(img1_path, img2_path):
+    """محاسبه شباهت بصری و هیستوگرام رنگی دو تصویر با Pillow"""
+    try:
+        img1 = Image.open(img1_path).convert("RGB").resize((64, 64))
+        img2 = Image.open(img2_path).convert("RGB").resize((64, 64))
+        
+        h1 = img1.histogram()
+        h2 = img2.histogram()
+        
+        rms = math.sqrt(sum((a - b) ** 2 for a, b in zip(h1, h2)) / len(h1))
+        similarity = max(0, 100 - (rms / 15))
+        return similarity
+    except Exception:
+        return 0
+
+
 def gallery_detail_view(request, album_id):
     album = get_object_or_404(GalleryAlbum, id=album_id)
-    photos = album.photos.all()
-    return render(
-        request, "core/gallery_detail.html", {"album": album, "photos": photos}
-    )
+    photos = album.photos.all().order_by("-id")
+    matched_photos = None
+    is_ai_search = False
+
+    if request.method == "POST":
+        # ۱. آپلود عکس جدید توسط عکاسان یا عوامل مجاز
+        if "upload_photo" in request.POST and request.user.is_authenticated:
+            if request.user.role in ["photographer", "director_actor", "general_supervisor", "women_supervisor"] or request.user.is_superuser:
+                new_img = request.FILES.get("photo_file")
+                caption = request.POST.get("caption", "")
+                if new_img:
+                    GalleryPhoto.objects.create(
+                        album=album,
+                        image=new_img,
+                        caption=caption
+                    )
+                    messages.success(request, "تصویر با موفقیت به آلبوم اضافه شد 📸")
+                    return redirect("gallery_detail", album_id=album.id)
+ # ۲. جستجوی هوشمند با تصویر (مخصوص بازیگران و عوامل)
+        elif "ai_search" in request.POST and request.FILES.get("reference_image"):
+            ref_img = request.FILES["reference_image"]
+            is_ai_search = True
+            scored_photos = []
+
+            for photo in photos:
+                if photo.image:
+                    score = calculate_image_similarity(ref_img, photo.image.path)
+                    if score >= 55:  # آستانه شباهت قابل قبول
+                        scored_photos.append((score, photo))
+            
+            scored_photos.sort(key=lambda x: x[0], reverse=True)
+            matched_photos = [item[1] for item in scored_photos]
+
+    context = {
+        "album": album,
+        "photos": matched_photos if is_ai_search else photos,
+        "is_ai_search": is_ai_search,
+    }
+    return render(request, "core/gallery_detail.html", context)
 
 
 # ۸. ویوی صفحه هنرمندان و بیوگرافی بازیگران
 def actors_view(request):
     actors = AllowedActorPhone.objects.filter(
-        role__in=["actor", "director_actor"]
+        role__in=["actor", "director_actor", "photographer", "sound_light", "logistics"]
     ).order_by("id")
     return render(request, "core/actors.html", {"actors": actors})
 
@@ -231,7 +307,9 @@ def reservation_form_view(request):
         )
         return redirect("home")
     return render(request, "core/reservation_form.html")
- # ۱۱. ویوی صفحه کمک به گروه
+
+
+# ۱۱. ویوی صفحه کمک به گروه
 def help_group_view(request):
     return render(request, "core/help_group.html")
 
@@ -244,22 +322,22 @@ def past_shows_view(request):
 
 # ۱۳. افزودن نمایشنامه جدید توسط کارگردان
 @login_required
-def play_create_view(request):
-    if request.user.role not in ["director_actor", "general_supervisor"]:
+def add_play_view(request):
+    if request.user.role not in ["director_actor", "general_supervisor"] and not request.user.is_superuser:
         return redirect("home")
 
     if request.method == "POST":
         form = PlayCreateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect("home")
+            return redirect("plays")
     else:
         form = PlayCreateForm()
 
     return render(request, "core/play_form.html", {"form": form})
 
 
-# ۱۴. آپلود تصویر در آرشیو اختصاصی بازیگر
+# ۱۴. آپلود تصویر در آرشیو اختصاصی بازیگر/عکاس
 @login_required
 def upload_actor_archive(request):
     if request.method == "POST":
@@ -269,8 +347,33 @@ def upload_actor_archive(request):
             if not photo.caption:
                 photo.caption = request.user.username
             photo.save()
-            return redirect("home")
+            return redirect("profile")
     else:
         form = ActorArchiveUploadForm()
 
     return render(request, "core/upload_archive.html", {"form": form})
+
+
+# ۱۵. ویوی ثبت مشکلات تجهیزات (صوت، نور، تدارکات)
+@login_required
+def report_issue_view(request):
+    if request.method == "POST":
+        section = request.POST.get("section")
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        
+        allowed_reporter = AllowedActorPhone.objects.filter(phone_number=request.user.phone_number).first()
+        
+        if allowed_reporter:
+            TechnicalIssue.objects.create(
+                reporter=allowed_reporter,
+                section=section,
+                title=title,
+                description=description
+            )
+            messages.success(request, "گزارش مشکل تجهیزات با موفقیت ثبت شد.")
+            return redirect("profile")
+        else:
+            messages.error(request, "شما دسترسی لازم برای ثبت گزارش را ندارید.")
+            
+    return render(request, "core/report_issue.html")

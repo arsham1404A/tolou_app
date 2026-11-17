@@ -1,4 +1,4 @@
-c
+ {% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -102,6 +102,17 @@ c
             align-items: center;
             gap: 5px;
         }
+
+        .back-home {
+            display: block;
+            text-align: center;
+            margin: 40px auto 0;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .back-home:hover { color: #00ff66; }
     </style>
 </head>
 <body>
@@ -109,19 +120,24 @@ c
     <h1 class="header-title">🎭 آرشیو نمایشنامه‌های گروه طلوع</h1>
 
     <div class="plays-container">
-        
+ {% for play in plays %}
         <div class="play-card">
             <div class="media-box">
                 <!-- ویدیو تیزر (پشت پوستر) -->
+                {% if play.teaser %}
                 <video class="play-teaser" controls>
                     <source src="{{ play.teaser.url }}" type="video/mp4">
                     مرورگر شما از ویدیو پشتیبانی نمی‌کند.
                 </video>
+                {% endif %}
 
                 <!-- پوستر (روی ویدیو) -->
-                <img src="{{ play.poster.url }}" class="play-poster" id="poster-{{ play.id }}">
- <!-- فلش سمت چپ برای رفتن پوستر و آمدن تیزر -->
-                <button class="switch-btn" onclick="toggleTeaser('{{ play.id }}')" title="مشاهده تیزر">
+                {% if play.poster %}
+                <img src="{{ play.poster.url }}" class="play-poster" id="poster-{{ play.id }}" alt="{{ play.title }}">
+                {% endif %}
+
+                <!-- فلش سمت چپ برای رفتن پوستر و آمدن تیزر -->
+                <button class="switch-btn" onclick="toggleTeaser('{{ play.id }}')" title="مشاهده تیزر / پوستر">
                     ❮
                 </button>
             </div>
@@ -130,6 +146,7 @@ c
                 <h2>{{ play.title }}</h2>
                 <p class="short-desc">{{ play.short_description }}</p>
 
+                {% if play.full_description %}
                 <div class="full-desc" id="full-desc-{{ play.id }}">
                     {{ play.full_description|linebreaks }}
                 </div>
@@ -137,12 +154,16 @@ c
                 <button class="more-btn" onclick="toggleDesc('{{ play.id }}', this)">
                     <span>توضیحات بیشتر</span> ▼
                 </button>
+                {% endif %}
             </div>
         </div>
-        
-        <p style="text-align: center; color: #888;">هیچ نمایشنامه‌ای هنوز ثبت نشده است.</p>
+        {% empty %}
+        <p style="text-align: center; color: #888; padding: 40px;">هیچ نمایشنامه‌ای هنوز در آرشیو ثبت نشده است.</p>
+        {% endfor %}
         
     </div>
+
+    <a href="{% url 'home' %}" class="back-home">← بازگشت به صفحه اصلی سامانه</a>
 
     <script>
         // سوئیچ پوستر به تیزر

@@ -9,11 +9,12 @@ import string
 ROLE_CHOICES = [
     ('actor', 'بازیگر'),
     ('logistics', 'تدارکات'),
-    ('lighting', 'مسئول نور'),
+    ('lighting', 'مسئول نور و صوت'),
     ('stage_manager', 'مدیر صحنه'),
     ('director_actor', 'کارگردان/بازیگر'),
     ('women_supervisor', 'سرپرست بانوان'),
     ('general_supervisor', 'سرپرست کل'),
+    ('photographer', 'عکاس'),
 ]
 
 # ۱. مدل کاربر سفارشی برای سامانه
@@ -27,21 +28,22 @@ class User(AbstractUser):
         verbose_name = "کاربر"
         verbose_name_plural = "کاربران"
 
+    def str(self):
+        return f"{self.username} - {self.get_role_display()}"
 
-# ۲. لیست شماره‌های مجاز بازیگران و عوامل (تولید اتوماتیک پسورد رندوم در صورت خالی گذاشتن ادمین)
+
+# ۲. لیست شماره‌های مجاز بازیگران و عوامل (تولید اتوماتیک پسورد رندوم)
 class AllowedActorPhone(models.Model):
     full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
     phone_number = models.CharField(max_length=11, unique=True, verbose_name="شماره همراه")
-    password = models.CharField(max_length=128, blank=True, null=True, verbose_name="رمز عبور (اگر خالی بگذارید، سیستم خودکار رمز رندوم می‌سازد)")
+    password = models.CharField(max_length=128, blank=True, null=True, verbose_name="رمز عبور")
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default='actor', verbose_name="نقش")
     role_description = models.CharField(max_length=100, default="عوامل/بازیگر", verbose_name="نقش / سمت")
     
-    # فیلدهای عکس و بیوگرافی برای صفحه بیوگرافی بازیگران
-    bio_image = models.ImageField(upload_to='actors/bio/', blank=True, null=True, verbose_name="عکس بیوگرافی (صفحه هنرمندان)")
+    bio_image = models.ImageField(upload_to='actors/bio/', blank=True, null=True, verbose_name="عکس بیوگرافی")
     bio_text = models.TextField(blank=True, null=True, verbose_name="بیوگرافی کوتاه")
 
     def save(self, *args, **kwargs):
-        # اگر ادمین پسورد را خالی گذاشت، سیستم خودکار یک رمز رندوم ۸ رقمی می‌سازد و هش می‌کند
         if not self.password:
             random_pass = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
             self.password = make_password(random_pass)
@@ -57,8 +59,8 @@ class AllowedActorPhone(models.Model):
         return f"{self.full_name} - {self.get_role_display()} ({self.phone_number})"
 
     class Meta:
-        verbose_name = "شماره مجاز بازیگر"
-        verbose_name_plural = "لیست شماره‌های مجاز بازیگران"
+        verbose_name = "شماره مجاز بازیگر/عامل"
+        verbose_name_plural = "لیست شماره‌های مجاز عوامل"
 
 
 # ۳. پوستر روزشمار / آخرین اجرا (HomeBanner)
@@ -101,12 +103,17 @@ class GalleryPhoto(models.Model):
         return f"عکس آلبوم {self.album.title}"
 
 
-# ۵. نمایشنامه‌ها و تست نقش (Script)
-class Script(models.Model):
-    title = models.CharField(max_length=200, verbose_name="نام نمایشنامه")
-    writer = models.CharField(max_length=100, verbose_name="نویسنده")
-    file = models.FileField(upload_to="scripts/", verbose_name="فایل PDF نمایشنامه")
-    is_audition_open = models.BooleanField(default=False, verbose_name="تست فعال است؟")
+# ۵. مدل نمایشنامه‌ها (Play) - با پوستر، تیزر و توضیحات کامل
+class Play(models.Model):
+    title = models.CharField(max_length=200, verbose_name="عنوان نمایشنامه") 
+    writer = models.CharField(max_length=100, blank=True, null=True, verbose_name="نویسنده")
+    poster = models.ImageField(upload_to='plays/posters/', verbose_name="پوستر نمایشنامه")
+    teaser = models.FileField(upload_to='plays/teasers/', blank=True, null=True, verbose_name="ویدیو تیزر")
+    file = models.FileField(upload_to="scripts/", blank=True, null=True, verbose_name="فایل PDF نمایشنامه")
+    short_description = models.TextField(max_length=300, verbose_name="توضیحات کوتاه")
+    full_description = models.TextField(verbose_name="توضیحات کامل")
+    is_audition_open = models.BooleanField(default=False, verbose_name="تست برای این نمایشنامه فعال است؟")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
 
     class Meta:
         verbose_name = "نمایشنامه"
@@ -116,37 +123,84 @@ class Script(models.Model):
         return self.title
 
 
-# ۶. رزرو اجرا برای کاربران عادی (Show & Reservation)
-class Show(models.Model):
-    title = models.CharField(max_length=200, verbose_name="عنوان نمایش")
-    date_time = models.DateTimeField(verbose_name="زمان برگزاری")
-    capacity = models.PositiveIntegerField(verbose_name="ظرفیت سالن")
+# ۶. مدل نقش‌های هر نمایشنامه (جهت تخصیص به بازیگران یا تست دادن)
+class PlayRole(models.Model):
+    play = models.ForeignKey(Play, on_delete=models.CASCADE, related_name='roles', verbose_name="نمایشنامه")
+    role_name = models.CharField(max_length=100, verbose_name="نام نقش")
+    description = models.TextField(blank=True, null=True, verbose_name="ویژگی‌های نقش")
+    assigned_actor = models.ForeignKey(AllowedActorPhone, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_roles', verbose_name="بازیگر انتخاب شده")
+    is_filled = models.BooleanField(default=False, verbose_name="نقش پر شده است؟")
 
     class Meta:
-        verbose_name = "نمایش / اجرا"
-        verbose_name_plural = "رزرو اجراها"
+        verbose_name = "نقش نمایشنامه"
+        verbose_name_plural = "نقش‌های نمایشنامه‌ها"
 
     def str(self):
-        return self.title
+        return f"{self.role_name} در {self.play.title}"
 
 
+# ۷. فرم تست بازیگری (برای درخواست‌های ورودی کاربران)
+class Audition(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'آقا'),
+        ('female', 'خانم'),
+    ]
+
+    full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
+    phone = models.CharField(max_length=11, verbose_name="شماره تماس")
+    age = models.PositiveIntegerField(null=True, blank=True, verbose_name="سن")
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='male', verbose_name="جنسیت")
+    interest = models.CharField(max_length=100, null=True, blank=True, verbose_name="علاقه‌مندی / نقش")
+    target_play = models.ForeignKey(Play, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="مربوط به نمایشنامه")
+    video_file = models.FileField(upload_to='auditions/videos/', null=True, blank=True, verbose_name="ویدیو ارسالی تست")
+    experience = models.TextField(blank=True, null=True, verbose_name="سابقه کاری")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
+
+    class Meta:
+        verbose_name = "درخواست تست بازیگری"
+        verbose_name_plural = "درخواست‌های تست بازیگری"
+        
+    def str(self):
+        return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}" 
+
+
+# ۸. رزرو اجرا و درخواست‌های سالن
 class Reservation(models.Model):
     PLAY_CHOICES = [
-        ('یاس پرپر', 'یاس پرپر'),
+        ('بانوی بهشت', 'بانوی بهشت'),
         ('حضرت عباس', 'حضرت عباس'),
         ('امام حسین', 'امام حسین'),
         ('حضرت علی اکبر', 'حضرت علی اکبر'),
         ('حضرت قاسم', 'حضرت قاسم'),
         ('حضرت رقیه', 'حضرت رقیه'),
     ]
-
-    QUALITY_CHOICES = [
+QUALITY_CHOICES = [
         ('ندارد', 'ندارد'),
         ('ضعیف', 'ضعیف'),
         ('خوب', 'خوب'),
         ('خیلی خوب', 'خیلی خوب'),
     ]
 
+ # تعریف انتخاب‌ها بیرون از کلاس (در سطح فایل)
+PLAY_CHOICES = [
+    ('یاس پرپر', 'یاس پرپر'),
+    ('بانوی بهشت', 'بانوی بهشت'),
+    ('حضرت عباس', 'حضرت عباس'),
+    ('امام حسین', 'امام حسین'),
+    ('حضرت علی اکبر', 'حضرت علی اکبر'),
+    ('حضرت قاسم', 'حضرت قاسم'),
+    ('حضرت رقیه', 'حضرت رقیه'),
+]
+
+QUALITY_CHOICES = [
+    ('ندارد', 'ندارد'),
+    ('ضعیف', 'ضعیف'),
+    ('خوب', 'خوب'),
+    ('خیلی خوب', 'خیلی خوب'),
+]
+
+# ۸. رزرو اجرا و درخواست‌های سالن
+class Reservation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="کاربر ثبت‌کننده", null=True, blank=True)
     full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
     phone = models.CharField(max_length=11, verbose_name="شماره همراه")
@@ -163,51 +217,35 @@ class Reservation(models.Model):
         verbose_name = "رزرو اجرا"
         verbose_name_plural = "درخواست‌های رزرو اجرا"
 
-    def str(self):
+    def __str__(self):
         return f"{self.full_name} - {self.play_title} ({self.city})"
 
 
-# ۷. فرم تست بازیگری
-class Audition(models.Model):
-    GENDER_CHOICES = [
-        ('male', 'آقا'),
-        ('female', 'خانم'),
+# ۹. مدل گزارش مشکلات تجهیزات (صوت، نور، تدارکات) برای نمایش در داشبورد سرپرست
+class TechnicalIssue(models.Model):
+    SECTION_CHOICES = [
+        ('sound_light', 'صوت و نور'),
+        ('logistics', 'تدارکات'),
+        ('stage', 'صحنه'),
     ]
-
-    full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
-    phone = models.CharField(max_length=11, verbose_name="شماره تماس")
-    age = models.PositiveIntegerField(null=True, blank=True, verbose_name="سن")
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='male', verbose_name="جنسیت")
-    interest = models.CharField(max_length=100, null=True, blank=True, verbose_name="علاقه‌مندی")
-    video_file = models.FileField(upload_to='auditions/videos/', null=True, blank=True, verbose_name="ویدیو ارسالی تست")
-    experience = models.TextField(blank=True, null=True, verbose_name="سابقه کاری")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
-    class Meta:
-        verbose_name = "درخواست تست بازیگری"
-        verbose_name_plural = "درخواست‌های تست بازیگری"
-        
-    def str(self):
-        return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}" 
-
-
-# ۸. مدل نمایشنامه‌ها (Play) - با پوستر، تیزر و توضیحات کامل
-class Play(models.Model):
-    title = models.CharField(max_length=200, verbose_name="عنوان نمایشنامه") 
-    poster = models.ImageField(upload_to='plays/posters/', verbose_name="پوستر نمایشنامه")
-    teaser = models.FileField(upload_to='plays/teasers/', blank=True, null=True, verbose_name="ویدیو تیزر")
-    short_description = models.TextField(max_length=300, verbose_name="توضیحات کوتاه")
-    full_description = models.TextField(verbose_name="توضیحات کامل")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
+    
+    reporter = models.ForeignKey(AllowedActorPhone, on_delete=models.CASCADE, verbose_name="گزارش‌دهنده")
+    section = models.CharField(max_length=30, choices=SECTION_CHOICES, verbose_name="بخش مربوطه")
+    title = models.CharField(max_length=150, verbose_name="عنوان مشکل / تجهیز معیوب")
+    description = models.TextField(verbose_name="شرح کامل مشکل")
+    is_resolved = models.BooleanField(default=False, verbose_name="برطرف شده؟")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ گزارش")
 
     class Meta:
-        verbose_name = "نمایشنامه"
-        verbose_name_plural = "نمایشنامه‌ها"
+        verbose_name = "مشکل تجهیزات"
+        verbose_name_plural = "گزارش مشکلات تجهیزات (فنی و تدارکات)"
 
-    def str(self):
-        return self.title
+    def __str__(self):
+        status = "حل شده" if self.is_resolved else "در انتظار بررسی"
+        return f"{self.get_section_display()}: {self.title} ({status})"
 
 
-# ۹. مدل رویدادهای تاریخچه (HistoryEvent)
+# ۱۰. مدل رویدادهای تاریخچه (HistoryEvent)
 class HistoryEvent(models.Model):
     year = models.CharField(max_length=20, verbose_name="سال / تاریخ")
     title = models.CharField(max_length=200, verbose_name="عنوان رویداد")
@@ -219,11 +257,11 @@ class HistoryEvent(models.Model):
         verbose_name = "رویداد تاریخچه"
         verbose_name_plural = "تاریخچه و رویدادها"
 
-    def str(self):
+    def __str__(self):
         return f"{self.year} - {self.title}"
 
 
-# ۱۰. مدل هنرمندان و بازیگران (Actor)
+# ۱۱. مدل هنرمندان و بازیگران بخش بیوگرافی (Actor)
 class Actor(models.Model):
     name = models.CharField(max_length=150, verbose_name="نام هنرمند")
     role = models.CharField(max_length=150, verbose_name="نقش در تئاتر", blank=True, null=True)
@@ -234,6 +272,5 @@ class Actor(models.Model):
     class Meta:
         verbose_name = "هنرمند"
         verbose_name_plural = "هنرمندان و بازیگران"
-
-    def str(self):
+def __str__(self):
         return self.name
