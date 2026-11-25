@@ -17,6 +17,24 @@ ROLE_CHOICES = [
     ('photographer', 'عکاس'),
 ]
 
+PLAY_CHOICES = [
+    ('یاس پرپر', 'یاس پرپر'),
+    ('بانوی بهشت', 'بانوی بهشت'),
+    ('حضرت عباس', 'حضرت عباس'),
+    ('امام حسین', 'امام حسین'),
+    ('حضرت علی اکبر', 'حضرت علی اکبر'),
+    ('حضرت قاسم', 'حضرت قاسم'),
+    ('حضرت رقیه', 'حضرت رقیه'),
+]
+
+QUALITY_CHOICES = [
+    ('ندارد', 'ندارد'),
+    ('ضعیف', 'ضعیف'),
+    ('خوب', 'خوب'),
+    ('خیلی خوب', 'خیلی خوب'),
+]
+
+
 # ۱. مدل کاربر سفارشی برای سامانه
 class User(AbstractUser):
     phone_number = models.CharField(max_length=11, unique=True, null=True, blank=True, verbose_name="شماره همراه")
@@ -39,7 +57,7 @@ class AllowedActorPhone(models.Model):
     password = models.CharField(max_length=128, blank=True, null=True, verbose_name="رمز عبور")
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default='actor', verbose_name="نقش")
     role_description = models.CharField(max_length=100, default="عوامل/بازیگر", verbose_name="نقش / سمت")
-    
+
     bio_image = models.ImageField(upload_to='actors/bio/', blank=True, null=True, verbose_name="عکس بیوگرافی")
     bio_text = models.TextField(blank=True, null=True, verbose_name="بیوگرافی کوتاه")
 
@@ -49,7 +67,7 @@ class AllowedActorPhone(models.Model):
             self.password = make_password(random_pass)
         elif not self.password.startswith('pbkdf2_sha256$'):
             self.password = make_password(self.password)
-            
+
         super().save(*args, **kwargs)
 
     def check_user_password(self, raw_password):
@@ -83,13 +101,13 @@ class GalleryAlbum(models.Model):
     title = models.CharField(max_length=200, verbose_name="عنوان مناسبت / آلبوم")
     cover_image = models.ImageField(upload_to='gallery/covers/', verbose_name="تصویر کاور آلبوم")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
-
-    class Meta:
+class Meta:
         verbose_name = "آلبوم گالری"
         verbose_name_plural = "آرشیو تصاویر و آلبوم‌ها"
+        def str(self):
+            return self.title
 
-    def str(self):
-        return self.title
+
 class GalleryPhoto(models.Model):
     album = models.ForeignKey(GalleryAlbum, on_delete=models.CASCADE, related_name='photos', verbose_name="آلبوم مربوطه")
     image = models.ImageField(upload_to='gallery/photos/', verbose_name="تصویر")
@@ -105,7 +123,7 @@ class GalleryPhoto(models.Model):
 
 # ۵. مدل نمایشنامه‌ها (Play) - با پوستر، تیزر و توضیحات کامل
 class Play(models.Model):
-    title = models.CharField(max_length=200, verbose_name="عنوان نمایشنامه") 
+    title = models.CharField(max_length=200, verbose_name="عنوان نمایشنامه")
     writer = models.CharField(max_length=100, blank=True, null=True, verbose_name="نویسنده")
     poster = models.ImageField(upload_to='plays/posters/', verbose_name="پوستر نمایشنامه")
     teaser = models.FileField(upload_to='plays/teasers/', blank=True, null=True, verbose_name="ویدیو تیزر")
@@ -159,47 +177,10 @@ class Audition(models.Model):
     class Meta:
         verbose_name = "درخواست تست بازیگری"
         verbose_name_plural = "درخواست‌های تست بازیگری"
-        
+
     def str(self):
-        return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}" 
-
-
-# ۸. رزرو اجرا و درخواست‌های سالن
-class Reservation(models.Model):
-    PLAY_CHOICES = [
-        ('بانوی بهشت', 'بانوی بهشت'),
-        ('حضرت عباس', 'حضرت عباس'),
-        ('امام حسین', 'امام حسین'),
-        ('حضرت علی اکبر', 'حضرت علی اکبر'),
-        ('حضرت قاسم', 'حضرت قاسم'),
-        ('حضرت رقیه', 'حضرت رقیه'),
-    ]
-QUALITY_CHOICES = [
-        ('ندارد', 'ندارد'),
-        ('ضعیف', 'ضعیف'),
-        ('خوب', 'خوب'),
-        ('خیلی خوب', 'خیلی خوب'),
-    ]
-
- # تعریف انتخاب‌ها بیرون از کلاس (در سطح فایل)
-PLAY_CHOICES = [
-    ('یاس پرپر', 'یاس پرپر'),
-    ('بانوی بهشت', 'بانوی بهشت'),
-    ('حضرت عباس', 'حضرت عباس'),
-    ('امام حسین', 'امام حسین'),
-    ('حضرت علی اکبر', 'حضرت علی اکبر'),
-    ('حضرت قاسم', 'حضرت قاسم'),
-    ('حضرت رقیه', 'حضرت رقیه'),
-]
-
-QUALITY_CHOICES = [
-    ('ندارد', 'ندارد'),
-    ('ضعیف', 'ضعیف'),
-    ('خوب', 'خوب'),
-    ('خیلی خوب', 'خیلی خوب'),
-]
-
-# ۸. رزرو اجرا و درخواست‌های سالن
+        return f"{self.full_name} - {self.interest if self.interest else 'تست بازیگری'}"
+ # ۸. رزرو اجرا و درخواست‌های سالن
 class Reservation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="کاربر ثبت‌کننده", null=True, blank=True)
     full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
@@ -217,7 +198,7 @@ class Reservation(models.Model):
         verbose_name = "رزرو اجرا"
         verbose_name_plural = "درخواست‌های رزرو اجرا"
 
-    def __str__(self):
+    def str(self):
         return f"{self.full_name} - {self.play_title} ({self.city})"
 
 
@@ -228,7 +209,7 @@ class TechnicalIssue(models.Model):
         ('logistics', 'تدارکات'),
         ('stage', 'صحنه'),
     ]
-    
+
     reporter = models.ForeignKey(AllowedActorPhone, on_delete=models.CASCADE, verbose_name="گزارش‌دهنده")
     section = models.CharField(max_length=30, choices=SECTION_CHOICES, verbose_name="بخش مربوطه")
     title = models.CharField(max_length=150, verbose_name="عنوان مشکل / تجهیز معیوب")
@@ -240,7 +221,7 @@ class TechnicalIssue(models.Model):
         verbose_name = "مشکل تجهیزات"
         verbose_name_plural = "گزارش مشکلات تجهیزات (فنی و تدارکات)"
 
-    def __str__(self):
+    def str(self):
         status = "حل شده" if self.is_resolved else "در انتظار بررسی"
         return f"{self.get_section_display()}: {self.title} ({status})"
 
@@ -257,7 +238,7 @@ class HistoryEvent(models.Model):
         verbose_name = "رویداد تاریخچه"
         verbose_name_plural = "تاریخچه و رویدادها"
 
-    def __str__(self):
+    def str(self):
         return f"{self.year} - {self.title}"
 
 
@@ -272,5 +253,6 @@ class Actor(models.Model):
     class Meta:
         verbose_name = "هنرمند"
         verbose_name_plural = "هنرمندان و بازیگران"
-def __str__(self):
+
+    def str(self):
         return self.name

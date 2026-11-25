@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,10 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v283gegvn!2h1pws2kk*v=5k%0&l_-nzmpf&qs6ctc4h9a#a2y'
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-v283gegvn!2h1pws2kk*v=5k%0&l_-nzmpf&qs6ctc4h9a#a2y'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # اضافه شدن دامنه‌های آروان و رندر برای جلوگیری از خطای Bad Request (400)
 ALLOWED_HOSTS = [
@@ -33,15 +37,17 @@ ALLOWED_HOSTS = [
     '.onrender.com',
     '.tlouart.ir',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
 ]
 
 # تنظیمات امنیتی برای پذیرش درخواست‌های ورودی از طریق پروکسی
 CSRF_TRUSTED_ORIGINS = [
     'https://tlouart.ir',
     'https://www.tlouart.ir',
-    'https://tolou-app.onrender.com'
+    'https://tolou-app.onrender.com',
 ]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -54,7 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core'
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -133,31 +139,37 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
     BASE_DIR / "core" / "static",
 ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# Email
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+ # Email
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User'
+
 JAZZMIN_SETTINGS = {
     "site_title": "سامانه تئاتر طلوع",
     "site_header": "مدیریت تئاتر طلوع",
     "site_brand": "تئاتر طلوع 🎭",
     "welcome_sign": "به پنل مدیریت سلطنتی تئاتر طلوع خوش آمدید",
     "copyright": "گروه فرهنگی هنری طلوع",
-    
+
     "order_with_respect_to": [
         "core.HomeBanner",
         "core.Actor",
@@ -166,7 +178,7 @@ JAZZMIN_SETTINGS = {
         "core.GalleryAlbum",
         "core.GalleryPhoto",
     ],
-    
+
     "icons": {
         "auth": "fas fa-users-cog",
         "core.User": "fas fa-user",
